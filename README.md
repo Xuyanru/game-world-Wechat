@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# wechatqueue
+# game-world-Wechat
 
 > WeChat queue for an appointment
 
@@ -20,6 +19,3 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
-=======
-# game-world-Wechat
->>>>>>> b8c8788686f6d4a1bb2c784321e14e7e05ad6aa7
