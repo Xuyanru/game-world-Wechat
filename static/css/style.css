@@ -1,0 +1,119 @@
+::-webkit-scrollbar {
+	display: none
+}
+
+.container {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	padding-bottom: 2rem;
+}
+
+.el-button {
+	display: inline-block;
+	padding: 0.7rem 1rem;
+	font-size: 0.65rem;
+	margin: 0 0.1rem;
+}
+
+.el-select-dropdown {
+	text-align: right;
+}
+
+.el-autocomplete-suggestion__list {
+	text-align: right;
+}
+
+.grid-content,
+.el-autocomplete,
+.el-row .el-input__inner {
+	width: 100%;
+	border: none;
+	outline: none;
+	height: auto;
+	line-height: auto;
+	/*	padding: 0;*/
+}
+
+.el-row .el-input__inner {
+	text-align: right;
+}
+
+.el-autocomplete-suggestion li {
+	white-space: normal;
+}
+
+.el-autocomplete-suggestion li div {
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.el-card__body,
+.el-card__header {
+	padding: 0.7rem;
+}
+
+.btn {
+	line-height: 2rem;
+	font-size: 0.7rem;
+	text-align: center;
+	color: #FFFFFF;
+	background: #387EF7;
+	border-radius: 5px;
+	margin-top: 0.6rem
+}
+
+.icon {
+	padding-left: 1.5rem;
+}
+
+.icon.fk-bfr {
+	background: url(../../static/img/fk-bfr.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-idcard {
+	background: url(../../static/img/fk-idcard.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-phone {
+	background: url(../../static/img/fk-phone.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-car {
+	background: url(../../static/img/fk-car.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-company {
+	background: url(../../static/img/fk-company.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-time {
+	background: url(../../static/img/fk-time.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-timec {
+	background: url(../../static/img/fk-timec.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-timeend {
+	background: url(../../static/img/fk-timeend.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-why {
+	background: url(../../static/img/fk-why.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
+.icon.fk-star {
+	width: 0.5rem;
+	height: 0.5rem;
+	background: url(../../static/img/star.png) no-repeat 0 center;
+	background-size: 0.5rem;
+}
