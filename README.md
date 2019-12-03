@@ -1,4 +1,4 @@
-# game-world-Wechat
+# wechatqueue
 
 > WeChat queue for an appointment
 
