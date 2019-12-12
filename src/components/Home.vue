@@ -2,69 +2,87 @@
 	<div id="home">
 		<el-row class="top-select">
 			<el-col :span="8">
-				<el-select v-model="gameValue" placeholder="游戏名称">
+				<el-select v-model="theDate.gameid" placeholder="游戏名称">
 					<el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id">
 					</el-option>
 				</el-select>
 			</el-col>
 			<el-col :span="8">
-				<el-select v-model="areaValue" placeholder="游戏社区">
+				<el-select v-model="theDate.areaid" placeholder="游戏社区">
 					<el-option v-for="item in areaList" :key="item.id" :label="item.areaname" :value="item.id">
 					</el-option>
 				</el-select>
 			</el-col>
 			<el-col :span="8">
-				<el-select v-model="groupValue" placeholder="商品分组">
+				<el-select v-model="theDate.groupid" placeholder="商品分组">
 					<el-option v-for="item in groupList" :key="item.id" :label="item.groupName" :value="item.id">
 					</el-option>
 				</el-select>
 			</el-col>
 			<el-col :span="8">
-				<el-select v-model="typeValue" placeholder="装备名称">
+				<el-select v-model="theDate.equipmenttypeid" placeholder="装备类型">
 					<el-option v-for="item in typeList" :key="item.id" :label="item.typename" :value="item.id">
 					</el-option>
 				</el-select>
 			</el-col>
 			<el-col :span="8">
-				<el-select v-model="nameValue" placeholder="装备名称">
+				<el-select v-model="theDate.equipmentnameid" placeholder="装备名称">
 					<el-option v-for="item in nameList" :key="item.id" :label="item.equipmentname" :value="item.id">
 					</el-option>
 				</el-select>
 			</el-col>
 			<el-col :span="8">
-				<span @click="openFilter">
+				<span @click="drawer=true">
           筛选
         </span>
 			</el-col>
 		</el-row>
+		<!--售卖商品列表-->
+		<div class="infinite-list-wrapper search-list" style="overflow:auto">
+			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
+				<li class="clear" @click="gotoDetail(item)">
+					<el-card>
+						<div class="lf list-img">
+							<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" alt="" />
+
+						</div>
+						<div class="list-msg">
+							<p class="line-one">
+								{{"vsdvd"}}
+							</p>
+							<p class="line-two">
+								<span class="list-addr list-icon">
+									{{"vsdvd"}}
+								</span>
+								<span class="list-time list-icon">
+									{{"vsdvd"}}
+								</span>
+							</p>
+							<p class="line-three clear">
+								<span class="lf list-sponsor">主办方:{{"vsdvd"}}</span>
+								<span class="rt list-mumber">已报名:{{"vsdvd"}}</span>
+							</p>
+						</div>
+					</el-card>
+				</li>
+				<!--<li v-for="i in count" class="list-item">{{ i }}</li>-->
+			</ul>
+			<p v-if="loading" align="center">加载中...</p>
+			<p v-if="noMore" align="center">没有更多了</p>
+		</div>
 		<!--右侧抽屉搜索-->
 		<el-drawer :visible.sync="drawer" size="80%" :with-header="false">
 			<h4>选择搜索的属性</h4>
-			<el-form :inline="true"  class="demo-form-inline">
-				<el-form-item :label="item1.labeltext" v-for="item1 in propertyList">
-					<el-select v-model="item1.inputname" placeholder="请选择">
+			<el-form :inline="true" class="demo-form-inline">
+				<el-form-item :label="item1.labeltext" v-for="(item1, index) in propertyList">
+					<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
 						<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
 						</el-option>
 					</el-select>
 				</el-form-item>
 			</el-form>
+			<el-button type="primary" @click="initGetGoods">确定</el-button>
 		</el-drawer>
-		<!--<el-drawer title="我是标题" :visible.sync="drawer" :with-header="false">
-			<span>我来啦!</span>
-		</el-drawer>-->
-		<div>
-			<ul>
-				<li class="text-center bg-white" v-for="list in dataList" @click="gotoOrder(list)">
-					<div>
-						<span class="text-name">{{list.qname}}</span>
-						<span class="text-date">剩余数量:{{list.qLeft}}</span>
-					</div>
-					<span class="right-icon rt"></span>
-				</li>
-			</ul>
-
-			<p class="text-center" v-if="noListWarn">{{nolistMsg}}</p>
-		</div>
 	</div>
 </template>
 
@@ -73,31 +91,38 @@
 		name: 'Home',
 		data() {
 			return {
-				gameValue: "",
-				gameList: [],
-				areaValue: "",
+				theDate: {
+					gameid: "",
+					areaid: "",
+					groupid: "",
+					equipmenttypeid: "",
+					equipmentnameid: "",
+				},
 				areaList: [],
-				groupValue: "",
 				groupList: [],
-				typeValue: "",
 				typeList: [],
-				nameValue: "",
+				gameList: [],
 				nameList: [],
 				drawer: false,
 				propertyList: [],
 
+				pageNo: 1,
+				pageSize: 10,
+				dataList: [], //商品列表
+				count: 0, //记录总条数
+				loading: false,
+
 				startDate: "",
-				dataList: [],
 				noListWarn: false,
 				nolistMsg: "",
 			}
 		},
 		methods: {
 			//打开右侧搜索
-			openFilter: function() {
-				this.drawer = true;
-				this.getPropertyList();
-			},
+			//			openFilter: function() {
+			//				this.drawer = true;
+			//				this.getPropertyList();
+			//			},
 			//获取游戏名称
 			getGameList: function() {
 				this.$ajax.get("game/gameList", {
@@ -107,7 +132,7 @@
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.gameList = data.content;
-							this.gameValue = data.content[0].id;
+							this.theDate.gameid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.gameList = [];
 							this.noListWarn = true;
@@ -119,14 +144,14 @@
 			},
 			//获取区域名称
 			getAreaList: function() {
-				this.$ajax.get("game/areaList?gameId=" + this.gameValue, {
+				this.$ajax.get("game/areaList?gameId=" + this.theDate.gameid, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.areaList = data.content;
-							this.areaValue = data.content[0].id;
+							this.theDate.areaid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.areaList = [];
 							this.noListWarn = true;
@@ -138,16 +163,17 @@
 			},
 			//获取分类
 			getGroupList: function() {
-				this.$ajax.get("equipment/groupList?gameId=" + this.gameValue, {
+				this.$ajax.get("property/groupList?gameId=" + this.theDate.gameid, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.groupList = data.content;
-							this.groupValue = data.content[0].id;
+							this.theDate.groupid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.groupList = [];
+							this.theDate.groupid = "";
 							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
@@ -157,16 +183,19 @@
 			},
 			//获取装备类型
 			getTypeList: function() {
-				this.$ajax.get("equipment/typeList?groupId=" + this.groupValue, {
+				this.$ajax.get("property/typeList?groupId=" + this.theDate.groupid, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.typeList = data.content;
-							this.typeValue = data.content[0].id;
+							this.theDate.equipmenttypeid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.typeList = [];
+							this.theDate.equipmenttypeid = "";
+							this.nameList = [];
+							this.theDate.equipmentnameid = "";
 							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
@@ -176,16 +205,17 @@
 			},
 			//获取装备名称
 			getNameList: function() {
-				this.$ajax.get("equipment/nameList?typeId=" + this.typeValue, {
+				this.$ajax.get("property/nameList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.nameList = data.content;
-							this.nameValue = data.content[0].id;
+							this.theDate.equipmentnameid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
-							this.gameList = [];
+							this.nameList = [];
+							this.theDate.equipmentnameid = "";
 							this.nameList = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
@@ -195,17 +225,15 @@
 			},
 			//获取属性列表
 			getPropertyList: function() {
-				this.$ajax.get("equipment/propertyList?typeId=" + this.typeValue, {
+				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid', 'equipmentnameid']));
+				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
-//							for(var i=0;i<data.content.length;i++){
-//								data.content[i].inputvalue=data.content[i].inputvalue.split(",");
-//								
-//							}
 							this.propertyList = data.content;
+
 						} else if(data.code == 1000 && data.content == 0) {
 							this.propertyList = [];
 							this.nameList = true;
@@ -215,28 +243,86 @@
 						}
 					})
 			},
+			//获取商品列表
+			getSellGoods: function() {
+				this.loading = true;
+				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
+						timeout: 1000 * 15
+					})
+					.then((data) => {
+						console.log(data);
+						this.loading = false;
+						if(data.code == 1000 && data.content.length > 0) {
+							this.count = data.count;
+							if(this.pageNo == 1) {
+								this.dataList = data.content;
+							} else {
+								this.dataList = this.dataList.concat(data.content);
+							}
+							console.log(this.dataList);
+						} else if(data.code == 1000 && data.content == 0) {
+							this.count = data.count;
+						} else {
+							this.$parent.layerTimeout(data.msg);
+							return false
+						}
+					})
+			},
+			initGetGoods: function() {
+				this.pageNo = 1;
+				this.getSellGoods();
+				if(this.drawer) {
+					this.drawer = false;
+				}
+			},
+			gotoDetail(list) {
+				this.$router.push({
+					name: 'businessDetal',
+					params: {
+						did: list
+					}
+				});
+			},
 		},
-		watch: {
-			//
-			gameValue(val) {
-				this.getAreaList();
-				this.getGroupList();
+		computed: {
+			noMore() {
+				return this.dataList.length >= this.count;
 			},
-			//
-			groupValue(val) {
-				this.getTypeList();
-			},
-			//
-			typeValue(val) {
-				this.getNameList();
-			},
-			//
-			typeList(val) {
+			disabled() {
+				return this.loading || this.noMore
+			}
+		},
+		watch: { //
+			'theDate.gameid' (val) {
+				if(val) {
+					this.getAreaList();
+					this.getGroupList();
+					this.initGetGoods();
+				}
 
 			},
+			'theDate.areaid' (val) {
+				this.initGetGoods();
+			},
 			//
-			nameList(val) {
-
+			'theDate.groupid' (val) {
+				if(val) {
+					this.getTypeList();
+					this.initGetGoods();
+				}
+			},
+			//
+			'theDate.equipmenttypeid' (val) {
+				if(val) {
+					this.getNameList();
+					this.getPropertyList();
+					this.initGetGoods();
+				}
+			},
+			'theDate.equipmentnameid' (val) {
+				if(val) {
+					this.initGetGoods();
+				}
 			},
 		},
 		beforeRouteLeave(to, from, next) {
@@ -247,10 +333,8 @@
 			this.isFirstEnter = true;
 		},
 		activated() {
-			if(this.$route.meta.needReload) {
-				// this.$parent.getBasicUrlFun(this.getGameList);
-				// this.getCount();
-			}
+			this.$parent.getBasicUrlFun(this.getGameList);
+			this.$route.meta.needReload = true;
 		},
 		mounted() {
 			this.$parent.getBasicUrlFun(this.getGameList);
@@ -297,7 +381,83 @@
 		text-align: center;
 	}
 	
-	#home ul li {
+	.el-drawer.ltr,
+	.el-drawer.rtl,
+	.el-drawer__container {
+		overflow: auto;
+	}
+	
+	.search-list ul li {
+		padding: .5rem;
+		border-bottom: 1px solid #999
+	}
+	
+	.search-list ul li .list-img {
+		width: 5.25rem;
+		height: 4.5rem
+	}
+	
+	.search-list ul li .list-img img {
+		width: 100%;
+		height: 100%;
+		border-radius: 10px
+	}
+	
+	.search-list ul li .list-msg {
+		margin-left: 5.25rem;
+		padding-left: .2rem
+	}
+	
+	.search-list ul li .list-msg .line-one {
+		font-size: .8rem;
+		line-height: .8rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		padding-top: .2rem;
+		height: 1.5rem
+	}
+	
+	.search-list ul li .list-msg .line-two,
+	.search-list ul li .list-msg .line-three {
+		margin-top: .55rem;
+		font-size: .7rem;
+		color: #bfbfbf;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis
+	}
+	
+	.search-list ul li .list-msg .line-three .list-sponsor {
+		width: 7rem;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis
+	}
+	
+	.list-icon {
+		padding-left: .8rem
+	}
+	
+	.search-list ul li .list-msg .line-two .list-addr {
+		background: url("../../static/img/address.png") no-repeat left center
+	}
+	
+	.search-list ul li .list-msg .line-two .list-addr {
+		margin-right: .5rem
+	}
+	
+	.search-list ul li .list-msg .line-two .list-time {
+		background: url("../../static/img/time.png") no-repeat left center
+	}
+	
+	.search-list ul li .list-msg .line-three span {
+		font-size: .7rem;
+		color: #bfbfbf
+	}
+	/*#home ul li {
 		height: 3rem;
 		line-height: 3rem;
 		margin: 0.3rem 0;
@@ -326,5 +486,5 @@
 	
 	.el-drawer__body {
 		padding: 0.8rem;
-	}
+	}*/
 </style>
