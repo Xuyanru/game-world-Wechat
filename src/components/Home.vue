@@ -1,6 +1,6 @@
 <template>
 	<div id="home">
-		<el-row class="top-select">
+		<el-row class="top-select" :gutter="1">
 			<el-col :span="8">
 				<el-select v-model="theDate.gameid" placeholder="游戏名称">
 					<el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id">
@@ -40,27 +40,27 @@
 		<!--售卖商品列表-->
 		<div class="infinite-list-wrapper search-list" style="overflow:auto">
 			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
-				<li class="clear" @click="gotoDetail(item)">
+				<li class="clear" @click="gotoDetail(item)" v-for="item in dataList">
 					<el-card>
 						<div class="lf list-img">
-							<img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" alt="" />
+							<img :src="$parent.baseURL+item.smallimg" alt="" />
 
 						</div>
 						<div class="list-msg">
 							<p class="line-one">
-								{{"vsdvd"}}
+								{{item.title}}
 							</p>
 							<p class="line-two">
-								<span class="list-addr list-icon">
-									{{"vsdvd"}}
-								</span>
-								<span class="list-time list-icon">
-									{{"vsdvd"}}
+								<span class="list-icon" v-for="(val, key, index) in item" v-if='propertyName[key]&&val'>
+									{{key!="sex"?propertyName[key]+val:propertyName[key]+(val==0?"女":"男")}}
 								</span>
 							</p>
 							<p class="line-three clear">
-								<span class="lf list-sponsor">主办方:{{"vsdvd"}}</span>
-								<span class="rt list-mumber">已报名:{{"vsdvd"}}</span>
+								<span class="lf list-sponsor text-danger">{{item.price}}</span>
+								<span class="text-danger lf" v-if="item.pricetype==0">金币</span>
+								<span class="text-danger lf" v-if="item.pricetype==1">元宝</span>
+								<span class="text-danger lf" v-if="item.pricetype==2">RMB</span>
+								<span class="rt list-mumber">{{item.refreshdate}}</span>
 							</p>
 						</div>
 					</el-card>
@@ -74,12 +74,15 @@
 		<el-drawer :visible.sync="drawer" size="80%" :with-header="false">
 			<h4>选择搜索的属性</h4>
 			<el-form :inline="true" class="demo-form-inline">
-				<el-form-item :label="item1.labeltext" v-for="(item1, index) in propertyList">
-					<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
-						<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
-						</el-option>
-					</el-select>
-				</el-form-item>
+				<el-col :span="12" v-for="(item1, index) in propertyList">
+					<el-form-item :label="item1.labeltext">
+						<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
+							<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
+							</el-option>
+						</el-select>
+					</el-form-item>
+				</el-col>
+
 			</el-form>
 			<el-button type="primary" @click="initGetGoods">确定</el-button>
 		</el-drawer>
@@ -118,13 +121,10 @@
 			}
 		},
 		methods: {
-			//打开右侧搜索
-			//			openFilter: function() {
-			//				this.drawer = true;
-			//				this.getPropertyList();
-			//			},
 			//获取游戏名称
 			getGameList: function() {
+//				this.gameList=[{"name":"原始传奇","id":"1"}];
+//				return;
 				this.$ajax.get("game/gameList", {
 						timeout: 1000 * 5
 					})
@@ -246,7 +246,8 @@
 			//获取商品列表
 			getSellGoods: function() {
 				this.loading = true;
-				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
+				//				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
+				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, {}, {
 						timeout: 1000 * 15
 					})
 					.then((data) => {
@@ -264,6 +265,7 @@
 							this.count = data.count;
 						} else {
 							this.$parent.layerTimeout(data.msg);
+							this.count=0;
 							return false
 						}
 					})
@@ -278,21 +280,21 @@
 			gotoDetail(list) {
 				this.$router.push({
 					name: 'businessDetal',
-					params: {
-						did: list
-					}
-				});
-			},
+params: {
+listMsg: list
+}
+});
+},
+},
+computed: {
+		noMore() {
+			return this.dataList.length >= this.count;
 		},
-		computed: {
-			noMore() {
-				return this.dataList.length >= this.count;
-			},
-			disabled() {
-				return this.loading || this.noMore
-			}
-		},
-		watch: { //
+		disabled() {
+			return this.loading || this.noMore
+		}
+	},
+	watch: {//
 			'theDate.gameid' (val) {
 				if(val) {
 					this.getAreaList();
@@ -339,6 +341,7 @@
 		mounted() {
 			this.$parent.getBasicUrlFun(this.getGameList);
 			this.$route.meta.needReload = true;
+			console.log(this.propertyName);
 		}
 	}
 </script>
@@ -347,38 +350,13 @@
 	#home {}
 	
 	#home .top-select {
-		font-size: 0.8rem;
-		line-height: 40px;
+		/*font-size: 0.8rem;
+		line-height: 40px;*/
 		text-align: center;
 	}
 	
-	#home .el-row .el-input__inner {
-		background: none;
-		color: #666666;
-		font-size: 0.8rem;
-		text-align: center;
-		padding-left: 0;
-	}
-	
-	#home .el-input--suffix .el-input__inner {
-		padding-right: 2rem;
-		text-align: right;
-	}
-	
-	#home .el-input__suffix {
-		right: 1rem;
-	}
-	
-	#home .el-input__icon {
-		width: 15px;
-	}
-	
-	#home .el-select .el-input .el-select__caret {
-		font-size: 0.7rem;
-	}
-	
-	.el-select-dropdown__item {
-		text-align: center;
+	#home .el-row .el-col {
+		margin-bottom: 1px;
 	}
 	
 	.el-drawer.ltr,
@@ -431,10 +409,14 @@
 	}
 	
 	.search-list ul li .list-msg .line-three .list-sponsor {
-		width: 7rem;
 		overflow: hidden;
 		white-space: nowrap;
-		text-overflow: ellipsis
+		text-overflow: ellipsis;
+		margin-right: 0.2rem;
+	}
+	
+	.search-list ul li .list-msg .line-three .lf {
+		color: #a94442;
 	}
 	
 	.list-icon {
@@ -457,34 +439,8 @@
 		font-size: .7rem;
 		color: #bfbfbf
 	}
-	/*#home ul li {
-		height: 3rem;
-		line-height: 3rem;
-		margin: 0.3rem 0;
-		background: #FFFFFF;
-		position: relative;
-	}
-	
-	#home ul li .right-icon {
-		position: absolute;
-		top: 50%;
-		right: 0.2rem;
-		transform: translateY(-50%);
-		width: 1.5rem;
-		height: 1.5rem;
-	}
-	
-	#home ul li .text-name {
-		font-size: 0.8rem;
-		margin-right: 3rem;
-	}
-	
-	#home ul li .text-date {
-		font-size: 0.6rem;
-		color: #777777;
-	}
 	
 	.el-drawer__body {
 		padding: 0.8rem;
-	}*/
+	}
 </style>

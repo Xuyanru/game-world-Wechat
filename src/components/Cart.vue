@@ -1,6 +1,6 @@
 <template>
 	<div id="Cart">
-		<el-row class="top-select lineOne" :gutter="5">
+		<el-row class="top-select lineOne" :gutter="1">
 			<el-col :span="8" class="line-one">
 				<el-select v-model="theDate.gameid" placeholder="游戏名称">
 					<el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id">
@@ -32,19 +32,63 @@
 				</el-select>
 			</el-col>
 		</el-row>
-		<el-form :inline="true" class="demo-form-inline">
-			<el-form-item :label="item1.labeltext" v-for="(item1, index) in propertyList">
+		<el-form :inline="true" class="demo-form-inline theDetail">
+			<el-form-item :label="item1.labeltext" v-for="item1 in propertyList">
 				<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
 					<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
 					</el-option>
 				</el-select>
 			</el-form-item>
+			<p>提示：店装只选极品属性值即可，极品白装如裁决，攻选30，方便搜索</p>
+			<el-form-item label="价格">
+				<el-input v-model="theDate.price"></el-input>
+			</el-form-item>
+			<el-form-item>
+				<el-select v-model="theDate.pricetype" placeholder="请选择">
+					<el-option v-for="item in pricetypeList" :key="item.type" :label="item.name" :value="item.type">
+					</el-option>
+				</el-select>
+			</el-form-item>
+			<el-form-item label="数量">
+				<el-select v-model="theDate.count" placeholder="请选择">
+					<el-option v-for="item in 10" :key="item" :label="item" :value="item">
+					</el-option>
+				</el-select>
+			</el-form-item>
 		</el-form>
+		<el-form :inline="true" class="demo-form-inline theContent">
+			<el-form-item label="标题">
+				<el-input v-model="theDate.title"></el-input>
+			</el-form-item>
+			<el-form-item label="内容">
+				<el-input type="textarea" v-model="theDate.content"></el-input>
+			</el-form-item>
+			<el-form-item label="图片" id="thePicture">
+				<input type="file" accept="image/*" v-on:change="selImgCon1($event)">
+				<el-button type="primary" v-show="!theImg">选择图片</el-button>
+				<img :src="theImg" alt="" v-show="theImg" />
+			</el-form-item>
+		</el-form>
+		<el-form :inline="true" class="demo-form-inline theDetail">
+			<el-form-item label="姓名">
+				<el-input v-model="theDate.personname"></el-input>
+			</el-form-item>
+			<el-form-item label="微信">
+				<el-input v-model="theDate.qq"></el-input>
+			</el-form-item>
+			<el-form-item label="QQ">
+				<el-input v-model="theDate.wechat"></el-input>
+			</el-form-item>
+		</el-form>
+		<div class="text-center">
+			<el-button class="el-col-18 el-col-offset-3" type="warning" @click="setGoodsData">发&nbsp;&nbsp;&nbsp;布</el-button>
+		</div>
 	</div>
 </template>
 
 <script>
 	import QRCode from "qrcodejs2";
+	import { compressedImage, rotateImg, selImgCon } from './../myJs/compressedImage.js';
 	export default {
 		name: 'Cart',
 
@@ -56,7 +100,16 @@
 					groupid: "",
 					equipmenttypeid: "",
 					equipmentnameid: "",
+					pricetype: "",
+					'count': 1,
+					title: "",
+					content: "",
+					bigimg: "",
+					personname: "",
+					qq: '',
+					wechat: ''
 				},
+				theImg: "",
 				areaList: [],
 				groupList: [],
 				typeList: [],
@@ -64,6 +117,16 @@
 				nameList: [],
 				drawer: false,
 				propertyList: [],
+				pricetypeList: [{
+					type: 0,
+					name: "金币"
+				}, {
+					type: 1,
+					name: "元宝"
+				}, {
+					type: 2,
+					name: "RMB"
+				}],
 			}
 		},
 		methods: {
@@ -187,8 +250,59 @@
 						}
 					})
 			},
+			//选择图片
+			selImgCon1:function(e) {
+				var me = this;
+				var callback = function(base64) {
+					me.theDate.bigimg = base64;
+					me.theImg = base64;
+					console.log(me.theDate);
+				}
+				selImgCon(e, callback);
+				console.log(this.theImgSrc);
+			},
+			//整理发布数据
+			setGoodsData: function() {
+				for(var key in this.theDate) {
+					if(!this.theDate[key]) {
+						delete this.theDate[key];
+					}
+				}
+
+				console.log(this.theDate);
+				if(this.theImg) {
+					var me = this;
+					var callback = function(base64) {
+						me.theDate.bigimg=base64.split(",")[1];
+						me.comfirmGoods();
+					}
+					compressedImage(this.theImg, callback);
+				}else{
+					this.comfirmGoods();
+				}
+			},
+			//发布物品
+			comfirmGoods: function() {
+				console.log(this.theDate)
+				this.$ajax.post("sellManage/sellGoods",this.theDate,{
+						timeout: 1000 * 5
+					})
+					.then((data) => {
+						console.log(data);
+						if(data.code == 1000) {
+							this.$parent.layerTimeout("发布成功");
+						} else {
+							this.$parent.layerTimeout(data.msg);
+							return false
+						}
+					})
+
+			},
 		},
 		watch: { //
+			'theDate.bigimg' (val) {
+				console.log(val);
+			},
 			'theDate.gameid' (val) {
 				if(val) {
 					this.getAreaList();
@@ -203,7 +317,6 @@
 			'theDate.groupid' (val) {
 				if(val) {
 					this.getTypeList();
-					this.initGetGoods();
 				}
 			},
 			//
@@ -212,12 +325,7 @@
 					this.getNameList();
 					this.getPropertyList();
 				}
-			},
-			'theDate.equipmentnameid' (val) {
-				if(val) {
-					this.initGetGoods();
-				}
-			},
+			}
 		},
 		beforeRouteLeave(to, from, next) {
 
@@ -239,10 +347,29 @@
 
 <style>
 	#Cart .lineOne .line-one {
-		margin-bottom: 5px;
+		margin-bottom: 1px;
 	}
 	
-	#Cart .demo-form-inline{
+	#Cart .demo-form-inline {
 		padding: 10px;
+	}
+	
+	#thePicture .el-form-item__content {
+		width: auto;
+		max-width: 14rem;
+		height: auto;
+	}
+	
+	#thePicture .el-form-item__content img {
+		max-width: 100%;
+	}
+	
+	#thePicture .el-form-item__content input {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		opacity: 0;
 	}
 </style>

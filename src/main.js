@@ -13,15 +13,20 @@ import "../static/js/layer.js";
 import "../static/css/style.css";
 import "../static/css/mobiscroll.custom-2.17.0.min.css";
 import "../static/js/mobiscroll.custom-2.17.0.min.js";
+import propertyName from "@/myJs/propertyName.js";
+import EXIF from "exif-js";
+Vue.use(EXIF); 
 Vue.use(ElementUI);
 Vue.config.productionTip = false
+Vue.prototype.propertyName = propertyName;
+console.log();
 
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  components: {
-    App
-  },
-  template: '<App/>'
+	el: '#app',
+	router,
+	components: {
+		App
+	},
+	template: '<App/>'
 })

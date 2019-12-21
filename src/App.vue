@@ -39,9 +39,11 @@
 				isTuisong: false, //判断是否是推送页面
 				tuisongUrl: "", //推送页面地址,
 				currTime: {}, //时间
+				baseURL:"",//请求地址
 			}
 		},
 		mounted() {
+			console.log(this.$getPathName);
 
 			// sessionStorage.setItem("openId", "o5Qtn566LlTjA5AHibqPG-I6p63w");
 
@@ -142,6 +144,7 @@
 					} else {
 						me.$ajax.defaults.baseURL = response.theUrl;
 					}
+					me.baseURL=me.$ajax.defaults.baseURL;
 					callBack();
 				})
 			},
@@ -431,8 +434,11 @@
 	}
 	
 	.content {
+		width: 100%;
 		height: 100%;
 		padding-bottom: 3rem;
 		background: #E1E8FB;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 </style>

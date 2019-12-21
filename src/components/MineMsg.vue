@@ -3,20 +3,24 @@
 		<div id="MineMsg-con">
 			<p class="title text-center">请填写个人信息</p>
 			<ul>
-				<li class="clear">
+				<li class="clear fk-phone">
+					<p class="lf fk-phone icon">电话</p>
+					<input class="lf" v-model="tel" type="text" placeholder="请输入您的电话" name="" id="" value="" />
+				</li>
+				<li class="clear fk-bfr">
+					<p class="lf fk-bfr icon">QQ</p>
+					<input class="lf" v-model="QQNum" type="text" placeholder="请输入您的电话" name="" id="" value="" />
+				</li>
+				<!--<li class="clear">
 					<p class="lf icon fk-bfr">姓名
 						<span class="icon fk-star"></span>
 					</p>
 					<input class="lf" v-model="name" type="text" placeholder="请输入您的姓名(必填)" name="" id="" value="" />
 				</li>
-				<li class="clear fk-phone">
-					<p class="lf fk-phone icon">电话</p>
-					<input class="lf" v-model="tel" type="text" placeholder="请输入您的电话" name="" id="" value="" />
-				</li>
 				<li class="clear fk-idcard">
 					<p class="lf icon fk-idcard">证件号</p>
 					<input class="lf" v-model="idNum" type="text" placeholder="请输入您的身份证号码" name="" id="" value="" />
-				</li>
+				</li>-->
 			</ul>
 		</div>
 		<div class="text-danger theWarn">{{theWarn}}</div>
@@ -30,10 +34,10 @@
 		checkPhone
 	} from "../checkUserMsg.js";
 	export default {
-		name: 'Me',
+		name: 'MineMsg',
 		data() {
 			return {
-				name: "",
+				QQNum: "",
 				tel: "",
 				idNum: "",
 				theWarn: "",

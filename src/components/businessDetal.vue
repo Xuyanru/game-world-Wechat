@@ -1,15 +1,42 @@
 <template>
 	<div id="businessDetal">
 		<div class="banner">
-			<img src="../../static/img/banner1.png" alt="" />
+			<img :src="$parent.baseURL+theDetail.bigimg" alt="" />
 		</div>
 		<div class="listMsg">
-			<p>业务名称：{{listMsg.qname}}</p>
-			<p>已&nbsp;预&nbsp;约：{{listMsg.dcount}}</p>
-			<p>剩余数量：{{listMsg.qLeft}}</p>
+			<h3>{{theDetail.title}}</h3>
 		</div>
-		<div class="btn" @click="submitOrder">
-			立即预约
+		<div class="listMsg">
+			<ul>
+				<li>
+					<p v-if="theDetail.equipmentname">装备名称：{{theDetail.equipmentname}}</p>
+					<p v-if="theDetail.personname">角色名称：{{theDetail.personname}}</p>
+				</li>
+				<li>
+					<p>装备属性：
+						<span class="" v-for="(val, key, index) in theDetail" v-if='propertyName[key]&&val'>
+							{{key!="sex"?propertyName[key]+"/"+val:propertyName[key]+"/"+(val==0?"女":"男")}}
+						</span>
+					</p>
+					<p>装备价格：
+						<span class="text-danger">{{theDetail.price}}</span>
+						<span class="text-danger" v-if="theDetail.pricetype==0">金币</span>
+						<span class="text-danger" v-if="theDetail.pricetype==1">元宝</span>
+						<span class="text-danger" v-if="theDetail.pricetype==2">RMB</span>
+					</p>
+					<p>发布时间：{{theDetail.refreshdate}}</p>
+					<p>装备说明：{{theDetail.content}}</p>
+				</li>
+			</ul>
+		</div>
+		<div class="listMsg" v-if="showConnctMsg">
+			<h4>联系方式</h4>
+			<p v-if="productOrnerMsg.wechat">微信：{{productOrnerMsg.wechat}}</p>
+			<p v-if="productOrnerMsg.qq">QQ：{{productOrnerMsg.qq}}</p>
+			<p v-if="productOrnerMsg.phone">手机：{{productOrnerMsg.phone}}</p>
+		</div>
+		<div class="btn" @click="getConnctMsg">
+			查看联系方式
 		</div>
 	</div>
 </template>
@@ -19,45 +46,30 @@
 		name: 'businessDetal',
 		data() {
 			return {
-				startDate: "",
-				theCount: 0,
-				selet: "",
-				qCode: "",
-				listMsg: "",
-				theDate: "",
-				sTimes: "",
-				eTime: ""
+				theDetail: "",
+				productOrnerMsg: "",
+				showConnctMsg: false
 			}
 		},
 		methods: {
 			init() {
-
+				console.log(this.$route.params.listMsg);
+				this.theDetail = this.$route.params.listMsg;
+				this.productOrnerMsg = "";
+				this.showConnctMsg = false;
 			},
-			submitOrder() {
-				var me = this;
-				var sTime = this.theDate + " " + me.sTimes + ":00";
-				var eTime = this.theDate + " " + me.eTime + ":00";
-				if(!this.$parent.vBasicMsg.uname) {
-					me.$parent.layerTimeout("请先补全信息再预约");
-					me.$router.push("/Me");
-				}
-				console.log(sTime, eTime);
-				this.$ajax.get("wxqueue/takeOrder/" + this.$parent.openId + "/" + this.qCode + "/" + sTime + "/" + eTime, {
+			getConnctMsg() {
+				this.$ajax.get("sellManage/showGoodsContact?equipmentGuid=" + this.theDetail.guid, {
 						timeout: 1000 * 5
 					})
-					.then(function(response) {
+					.then((response) => {
 						console.log(response);
-						if(response.status == 200) {
-							var data = response.data;
-							if(data.code == 1000) {
-								var callBack = function() {
-									me.$router.push("/Cart");
-								}
-								me.$parent.layerTimeout("预约成功", callBack);
-							} else {
-								me.$parent.layerTimeout(data.msg);
-								return false
-							}
+						if(response.code == 1000 && response.content) {
+							this.showConnctMsg = true;
+							this.productOrnerMsg = response.content;
+						} else {
+							me.$parent.layerTimeout(response.msg);
+							return false
 						}
 					})
 			}
@@ -93,7 +105,12 @@
 	.listMsg {
 		line-height: 1.5rem;
 		background: #FFFFFF;
-		padding: 0.8rem
+		padding: 0.5rem;
+		margin: 0.2rem 0;
+	}
+	
+	.propList {
+		padding-left: 2rem;
 	}
 	
 	.inputOut {

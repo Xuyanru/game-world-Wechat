@@ -16,7 +16,7 @@
 				</div>
 				<div>出售</div>
 			</router-link>
-			<router-link :to="{name:'Me'}" tag="li">
+			<router-link :to="{name:'MyFile'}" tag="li">
 				<div>
 					<p class="icon iconfont icon-Me"></p>
 				</div>

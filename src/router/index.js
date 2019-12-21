@@ -4,7 +4,8 @@ import Home from '@/components/Home';
 import businessDetal from '@/components/businessDetal';
 import Cart from '@/components/Cart';
 import cartDetail from '@/components/cartDetail';
-import Me from '@/components/Me';
+import MineMsg from '@/components/MineMsg';
+import MyFile from '@/components/MyFile';
 
 Vue.use(Router);
 
@@ -20,7 +21,7 @@ export default new Router({
 			component: Home,
 			meta: {
 				navShow: true,
-				needReload:false,
+				needReload: false,
 			}
 		},
 		{
@@ -31,7 +32,6 @@ export default new Router({
 				navShow: false
 			},
 			params: {
-				dateTime: "",
 				listMsg: ""
 			}
 		},
@@ -52,9 +52,17 @@ export default new Router({
 			}
 		},
 		{
-			path: '/Me',
-			name: 'Me',
-			component: Me,
+			path: '/MyFile',
+			name: 'MyFile',
+			component: MyFile,
+			meta: {
+				navShow: true
+			}
+		},
+		{
+			path: '/MineMsg',
+			name: 'MineMsg',
+			component: MineMsg,
 			meta: {
 				navShow: true
 			}
