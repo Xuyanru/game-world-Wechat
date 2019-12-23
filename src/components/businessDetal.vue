@@ -23,6 +23,7 @@
 						<span class="text-danger" v-if="theDetail.pricetype==0">金币</span>
 						<span class="text-danger" v-if="theDetail.pricetype==1">元宝</span>
 						<span class="text-danger" v-if="theDetail.pricetype==2">RMB</span>
+						<span class="">{{theDetail.isprice==0?"可议价":"不可议价"}}</span>
 					</p>
 					<p>发布时间：{{theDetail.refreshdate}}</p>
 					<p>装备说明：{{theDetail.content}}</p>

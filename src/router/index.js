@@ -6,6 +6,7 @@ import Cart from '@/components/Cart';
 import cartDetail from '@/components/cartDetail';
 import MineMsg from '@/components/MineMsg';
 import MyFile from '@/components/MyFile';
+import myBusiness from '@/components/myBusiness';
 
 Vue.use(Router);
 
@@ -64,7 +65,15 @@ export default new Router({
 			name: 'MineMsg',
 			component: MineMsg,
 			meta: {
-				navShow: true
+				navShow: false
+			}
+		},
+		{
+			path: '/myBusiness',
+			name: 'myBusiness',
+			component: myBusiness,
+			meta: {
+				navShow: false
 			}
 		}
 	]

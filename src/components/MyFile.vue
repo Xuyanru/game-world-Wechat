@@ -17,7 +17,7 @@
 				</router-link>
 			</div>
 			<div class="card">
-				<router-link :to="{name:'MyFile'}" tag="li">
+				<router-link :to="{name:'myBusiness'}" tag="li">
 					<div class="item item-text-wrap item-icon-right">
 						商品管理
 						<i class="el-icon-arrow-right rt"></i>
@@ -45,48 +45,7 @@
 			}
 		},
 		methods: {
-			submitMsg() {
-				var me = this;
-				this.theWarn = "";
-				if(!this.name) {
-					this.theWarn = "姓名为必填项";
-					// this.$parent.layerTimeout("姓名为必填项");
-					return false;
-				} else if(this.tel && !checkPhone(this.tel)) {
-					this.theWarn = "手机号输入有误";
-					// this.$parent.layerTimeout("手机号输入有误");
-					return false;
-				} else if(this.idNum && !IdentityCodeValid(this.idNum)) {
-					this.theWarn = "身份证号输入有误";
-					// this.$parent.layerTimeout("身份证号输入有误");
-					return false;
-				}
 
-				var sendMsg = {
-					idnum: this.idNum,
-					uname: this.name,
-					utel: this.tel
-				}
-				this.$ajax.post("wxuser/addOrUpdateWxUser", sendMsg, {
-						timeout: 1000 * 5
-					})
-					.then(function(response) {
-						console.log(response);
-						if(response.status == 200) {
-							var data = response.data;
-							if(data.code == 1000) {
-								var theMsg = data.content;
-								var callBack = function() {
-									me.$parent.refreshMsg(theMsg);
-								}
-								me.$parent.layerTimeout("提交成功", callBack);
-							} else {
-								me.$parent.layerTimeout(data.msg);
-								return false
-							}
-						}
-					})
-			}
 		},
 
 		beforeRouteLeave(to, from, next) {

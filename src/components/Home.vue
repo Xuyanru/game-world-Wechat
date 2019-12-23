@@ -33,15 +33,15 @@
 			</el-col>
 			<el-col :span="8">
 				<span @click="drawer=true">
-          筛选
-        </span>
+					筛选
+				</span>
 			</el-col>
 		</el-row>
 		<!--售卖商品列表-->
 		<div class="infinite-list-wrapper search-list" style="overflow:auto">
 			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
-				<li class="clear" @click="gotoDetail(item)" v-for="item in dataList">
-					<el-card>
+				<li class="clear" @click="gotoDetail(item,)" v-for="(item,index) in dataList">
+					<el-card class="clear">
 						<div class="lf list-img">
 							<img :src="$parent.baseURL+item.smallimg" alt="" />
 
@@ -60,6 +60,16 @@
 								<span class="text-danger lf" v-if="item.pricetype==0">金币</span>
 								<span class="text-danger lf" v-if="item.pricetype==1">元宝</span>
 								<span class="text-danger lf" v-if="item.pricetype==2">RMB</span>
+								<span class="lf list-mumber">{{item.isprice==0?"可议价":"不可议价"}}</span>
+							</p>
+							<p class="line-four clear">
+								<span class="zan lf" @click.stop="supportFun(item,index)">
+									<i class="notSupport" v-if="item.isSupport==0"></i>
+									<i class="isSupport" v-if="item.isSupport==1"></i>
+								</span>
+								<span>
+									{{item.support }}
+								</span>
 								<span class="rt list-mumber">{{item.refreshdate}}</span>
 							</p>
 						</div>
@@ -121,10 +131,28 @@
 			}
 		},
 		methods: {
+			//点赞或取消点赞操作
+			supportFun: function(theDetail, idx) {
+				if(theDetail.isSupport == 0) {
+					this.dataList[idx].isSupport = 1;
+					this.dataList[idx].support++;
+				} else {
+					this.dataList[idx].isSupport = 0;
+					this.dataList[idx].support--;
+				}
+
+				this.$ajax.get("sellManage/goodsSupport?equipmentGuid="+theDetail.guid+"&status="+this.dataList[idx].isSupport, {
+						timeout: 1000 * 5
+					})
+					.then((data) => {
+						console.log(data);
+						
+					}) 
+			},
 			//获取游戏名称
 			getGameList: function() {
-//				this.gameList=[{"name":"原始传奇","id":"1"}];
-//				return;
+				//				this.gameList=[{"name":"原始传奇","id":"1"}];
+				//				return;
 				this.$ajax.get("game/gameList", {
 						timeout: 1000 * 5
 					})
@@ -225,7 +253,9 @@
 			},
 			//获取属性列表
 			getPropertyList: function() {
-				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid', 'equipmentnameid']));
+				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid',
+					'equipmentnameid'
+				]));
 				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 5
 					})
@@ -245,6 +275,9 @@
 			},
 			//获取商品列表
 			getSellGoods: function() {
+				if(this.loading) {
+					return
+				}
 				this.loading = true;
 				//				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
 				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, {}, {
@@ -252,7 +285,6 @@
 					})
 					.then((data) => {
 						console.log(data);
-						this.loading = false;
 						if(data.code == 1000 && data.content.length > 0) {
 							this.count = data.count;
 							if(this.pageNo == 1) {
@@ -260,12 +292,14 @@
 							} else {
 								this.dataList = this.dataList.concat(data.content);
 							}
+							this.pageNo++;
+							this.loading = false;
 							console.log(this.dataList);
 						} else if(data.code == 1000 && data.content == 0) {
 							this.count = data.count;
 						} else {
 							this.$parent.layerTimeout(data.msg);
-							this.count=0;
+							this.count = 0;
 							return false
 						}
 					})
@@ -280,21 +314,21 @@
 			gotoDetail(list) {
 				this.$router.push({
 					name: 'businessDetal',
-params: {
-listMsg: list
-}
-});
-},
-},
-computed: {
-		noMore() {
-			return this.dataList.length >= this.count;
+					params: {
+						listMsg: list
+					}
+				});
+			},
 		},
-		disabled() {
-			return this.loading || this.noMore
-		}
-	},
-	watch: {//
+		computed: {
+			noMore() {
+				return this.dataList.length >= this.count;
+			},
+			disabled() {
+				return this.loading || this.noMore
+			}
+		},
+		watch: { //
 			'theDate.gameid' (val) {
 				if(val) {
 					this.getAreaList();
@@ -339,7 +373,7 @@ computed: {
 			this.$route.meta.needReload = true;
 		},
 		mounted() {
-			this.$parent.getBasicUrlFun(this.getGameList);
+			// this.$parent.getBasicUrlFun(this.getGameList);
 			this.$route.meta.needReload = true;
 			console.log(this.propertyName);
 		}
@@ -372,7 +406,7 @@ computed: {
 	
 	.search-list ul li .list-img {
 		width: 5.25rem;
-		height: 4.5rem
+		height: 5.25rem
 	}
 	
 	.search-list ul li .list-img img {
@@ -382,13 +416,14 @@ computed: {
 	}
 	
 	.search-list ul li .list-msg {
+		height: 5.25rem;
 		margin-left: 5.25rem;
-		padding-left: .2rem
+		padding-left: .5rem;
 	}
 	
 	.search-list ul li .list-msg .line-one {
 		font-size: .8rem;
-		line-height: .8rem;
+		line-height: 1rem;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		display: -webkit-box;
@@ -399,10 +434,11 @@ computed: {
 	}
 	
 	.search-list ul li .list-msg .line-two,
-	.search-list ul li .list-msg .line-three {
-		margin-top: .55rem;
+	.search-list ul li .list-msg .line-three,
+	.search-list ul li .list-msg .line-four {
+		margin-top: 0.2rem;
 		font-size: .7rem;
-		color: #bfbfbf;
+		color: #929292;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis
@@ -415,29 +451,44 @@ computed: {
 		margin-right: 0.2rem;
 	}
 	
-	.search-list ul li .list-msg .line-three .lf {
-		color: #a94442;
+	.search-list ul li .list-msg .line-three span.list-mumber {
+		color: #929292;
+		margin-left: 0.3rem;
+	}
+	
+	.search-list ul li .list-msg .line-four {
+		line-height: 1.5rem;
+		margin-top: 0.3rem
+	}
+	
+	.search-list ul li .list-msg .line-four span.zan {
+		width: 1.2rem;
+		height: 1.2rem;
+	}
+	
+	.search-list ul li .list-msg .line-four span:nth-child(2) {
+		margin-left: 0.5rem;
+		font-size: 0.9rem;
+	}
+	
+	.search-list ul li .list-msg .line-four span.zan i {
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+	}
+	
+	.search-list ul li .list-msg .line-four span.zan i.notSupport {
+		background: url("../../static/img/notSupport.png") no-repeat;
+		background-size: 100%;
+	}
+	
+	.search-list ul li .list-msg .line-four span.zan i.isSupport {
+		background: url("../../static/img/isSupport.png") no-repeat;
+		background-size: 100%;
 	}
 	
 	.list-icon {
-		padding-left: .8rem
-	}
-	
-	.search-list ul li .list-msg .line-two .list-addr {
-		background: url("../../static/img/address.png") no-repeat left center
-	}
-	
-	.search-list ul li .list-msg .line-two .list-addr {
-		margin-right: .5rem
-	}
-	
-	.search-list ul li .list-msg .line-two .list-time {
-		background: url("../../static/img/time.png") no-repeat left center
-	}
-	
-	.search-list ul li .list-msg .line-three span {
-		font-size: .7rem;
-		color: #bfbfbf
+		padding-right: .3rem
 	}
 	
 	.el-drawer__body {

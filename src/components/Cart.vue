@@ -69,15 +69,16 @@
 				<img :src="theImg" alt="" v-show="theImg" />
 			</el-form-item>
 		</el-form>
-		<el-form :inline="true" class="demo-form-inline theDetail">
-			<el-form-item label="姓名">
-				<el-input v-model="theDate.personname"></el-input>
-			</el-form-item>
+		<p>联系方式</p>
+		<el-form :inline="true" class="demo-form-inline theContent">
 			<el-form-item label="微信">
 				<el-input v-model="theDate.qq"></el-input>
 			</el-form-item>
-			<el-form-item label="QQ">
+			<el-form-item label="Q Q">
 				<el-input v-model="theDate.wechat"></el-input>
+			</el-form-item>
+			<el-form-item label="电话">
+				<el-input v-model="theDate.phone"></el-input>
 			</el-form-item>
 		</el-form>
 		<div class="text-center">
@@ -105,7 +106,7 @@
 					title: "",
 					content: "",
 					bigimg: "",
-					personname: "",
+					phone: "",
 					qq: '',
 					wechat: ''
 				},
@@ -130,6 +131,12 @@
 			}
 		},
 		methods: {
+			init:function(){
+				var theBasicMsg=this.$parent.vBasicMsg?this.$parent.vBasicMsg:JSON.parse(sessionStorage.getItem("vBasicMsg"));
+				this.theDate.qq=theBasicMsg.qq;
+				this.theDate.wechat=theBasicMsg.wechat;
+				this.theDate.phone=theBasicMsg.phone;
+			},
 			//获取游戏名称
 			getGameList: function() {
 				this.$ajax.get("game/gameList", {
@@ -232,7 +239,7 @@
 			},
 			//获取属性列表
 			getPropertyList: function() {
-				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid', 'equipmentnameid']));
+				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid', 'equipmentnameid','qq','wechat','phone']));
 				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 5
 					})
@@ -335,6 +342,7 @@
 			this.isFirstEnter = true;
 		},
 		activated() {
+			this.init();
 			this.$parent.getBasicUrlFun(this.getGameList);
 			this.$route.meta.needReload = true;
 		},
