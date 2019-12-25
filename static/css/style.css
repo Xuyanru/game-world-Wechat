@@ -146,14 +146,14 @@
 }
 
 .theContent .el-form-item__content {
-	width: 14rem;
+	width: 15.8rem;
 }
 
 .theDetail .el-input__inner,
 .theContent .el-input__inner,
 .el-drawer .el-input__inner {
 	height: 2rem;
-	line-height: 2rem;
+	line-height: 1rem;
 	padding: 0 1rem 0 0.6rem;
 	font-size: 0.65rem;
 }

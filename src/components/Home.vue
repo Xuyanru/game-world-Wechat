@@ -141,13 +141,13 @@
 					this.dataList[idx].support--;
 				}
 
-				this.$ajax.get("sellManage/goodsSupport?equipmentGuid="+theDetail.guid+"&status="+this.dataList[idx].isSupport, {
+				this.$ajax.get("sellManage/goodsSupport?equipmentGuid=" + theDetail.guid + "&status=" + this.dataList[idx].isSupport, {
 						timeout: 1000 * 5
 					})
 					.then((data) => {
 						console.log(data);
-						
-					}) 
+
+					})
 			},
 			//获取游戏名称
 			getGameList: function() {
@@ -391,6 +391,23 @@
 	
 	#home .el-row .el-col {
 		margin-bottom: 1px;
+	}
+	
+	#home .el-row.top-select .el-col:last-child {
+		padding-left: 0;
+		line-height: 40px;
+	}
+	
+	#home .el-row.top-select .el-col:last-child span {
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+		font-size: 14px;
+		color: #606266;
+		border:0;
+		border-radius: 4px;
+		background-color: #FFF;
+		padding-right: 0.6rem;
 	}
 	
 	.el-drawer.ltr,

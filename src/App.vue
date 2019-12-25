@@ -80,7 +80,7 @@
 			// Add a response interceptor
 			axios.interceptors.response.use(function(response) {
 				// Do something with response data
-				if (response.status == 200) {
+				if(response.status == 200) {
 					return response.data;
 				} else {
 					me.layerErrorTimeout("请求错误");
@@ -88,8 +88,8 @@
 				// return response;
 			}, function(error) {
 				// Do something with response error
-				if (error && error.response) {
-					switch (error.response.status) {
+				if(error && error.response) {
+					switch(error.response.status) {
 						case 400:
 							me.layerErrorTimeout("请求错误");
 							break;
@@ -131,7 +131,7 @@
 				}
 				return Promise.reject(error);
 			});
-			
+
 			this.getBasicUrlFun(this.getUserInfo);
 
 			// this.getBasicUrlFun(me.getAllParam);
@@ -141,7 +141,7 @@
 				var me = this;
 				this.$ajax.defaults.baseURL = "";
 				this.$ajax.get('./static/configData/config.json').then((response) => {
-					if (response.data) {
+					if(response.data) {
 						me.$ajax.defaults.baseURL = response.data.theUrl;
 					} else {
 						me.$ajax.defaults.baseURL = response.theUrl;
@@ -154,10 +154,10 @@
 			getUserInfo: function() {
 				this.$ajax.post('user/userInfo', {}).then((data) => {
 					console.log(data);
-					if (data.code == 1000 && data.content) {
+					if(data.code == 1000 && data.content) {
 						this.vBasicMsg = data.content;
 						sessionStorage.setItem("vBasicMsg", JSON.stringify(data.content));
-					} else if (data.code == 1000 && data.content) {
+					} else if(data.code == 1000 && data.content) {
 						this.layerErrorTimeout("未获取到用户信息");
 					} else {
 						this.$parent.layerTimeout(data.msg);
@@ -200,12 +200,12 @@
 			GetUrlParam: function(paraName) {
 				var url = document.location.toString();
 				var arrObj = url.split("?");
-				if (arrObj.length > 1) {
+				if(arrObj.length > 1) {
 					var arrPara = arrObj[1].split("&");
 					var arr;
-					for (var i = 0; i < arrPara.length; i++) {
+					for(var i = 0; i < arrPara.length; i++) {
 						arr = arrPara[i].split("=");
-						if (arr != null && arr[0] == paraName) {
+						if(arr != null && arr[0] == paraName) {
 							return arr[1];
 						}
 					}
@@ -227,12 +227,12 @@
 					})
 					.then(function(response) {
 						console.log(response);
-						if (response.status == 200) {
+						if(response.status == 200) {
 							var data = response.data;
-							if (data.code == 0) {
+							if(data.code == 0) {
 								me.openId = data.openid;
 								me.wxBasicMsg = data;
-								if (me.isTuisong) {
+								if(me.isTuisong) {
 									me.tuisongUrl = window.location.href
 								}
 								//								me.layerShow("正在加载");
@@ -263,11 +263,11 @@
 					})
 					.then(function(response) {
 						console.log(response);
-						if (response.status == 200) {
+						if(response.status == 200) {
 							var data = response.data;
-							if (data.code == 1000) {
+							if(data.code == 1000) {
 								me.vBasicMsg = data.content;
-								if (data.content.areacode) {
+								if(data.content.areacode) {
 									me.areacode = data.content.areacode;
 									areacode = me.areacode;
 									// axios.defaults.headers.areaCode = areacode;
@@ -279,7 +279,7 @@
 								me.$router.push("/");
 								sessionStorage.setItem("userType", me.userType);
 							} else {
-								if (data.code == 2000) {
+								if(data.code == 2000) {
 									me.layerTimeout("请先补全信息再预约");
 									me.$router.push("/Me");
 								} else {
@@ -296,7 +296,7 @@
 			refreshMsg(theMsg) {
 				var me = this;
 				me.vBasicMsg = theMsg;
-				if (theMsg.areacode) {
+				if(theMsg.areacode) {
 					me.areacode = theMsg.areacode;
 					areacode = me.areacode;
 					// axios.defaults.headers.areaCode = areacode;
@@ -316,8 +316,8 @@
 
 			//获取用户code等基本参数
 			getAllParam: function() {
-				if (sessionStorage.getItem("openId")) {
-					if (sessionStorage.getItem("areacode") && sessionStorage.getItem("userType")) {
+				if(sessionStorage.getItem("openId")) {
+					if(sessionStorage.getItem("areacode") && sessionStorage.getItem("userType")) {
 						this.areacode = sessionStorage.getItem("areacode");
 						areacode = this.areacode;
 						this.openId = sessionStorage.getItem("openId");
@@ -328,10 +328,10 @@
 						this.vBasicMsg = JSON.parse(sessionStorage.getItem("vBasicMsg"));
 						this.userType = sessionStorage.getItem("userType");
 						this.userMsg = JSON.parse(sessionStorage.getItem("userMsg"));
-						if (sessionStorage.getItem("activeOpenId")) {
+						if(sessionStorage.getItem("activeOpenId")) {
 							this.activeOpenId = sessionStorage.getItem("activeOpenId")
 						}
-						if (this.$route.name == "examinationList") {
+						if(this.$route.name == "examinationList") {
 							this.$refs.theRouter.getList();
 						}
 					} else {
@@ -357,26 +357,26 @@
 			getMsgByUrl: function() {
 				this.state = this.GetUrlParam("state");
 				console.log(this.state);
-				if (this.state) {
+				if(this.state) {
 					this.theUserCode = this.GetUrlParam("code");
 					var theLastIdx = this.state.lastIndexOf("#/");
-					if (theLastIdx != -1) {
+					if(theLastIdx != -1) {
 						var params = this.state.slice(0, theLastIdx).split("!")
 					} else {
 						var params = this.state.split("!")
 					}
 					thisurl = window.location.href;
-					if (!this.theUserCode) {
+					if(!this.theUserCode) {
 						me.layerErrorTimeout("请求错误");
 						return false
 					}
-					if (params[1] == 2) {
+					if(params[1] == 2) {
 						this.isTuisong = true;
-						if (params[2]) {
+						if(params[2]) {
 							this.syncid = params[2];
 							sessionStorage.setItem("syncid", this.syncid)
 						}
-						if (params[3]) {
+						if(params[3]) {
 							this.activeOpenId = params[3];
 							sessionStorage.setItem("activeOpenId", this.activeOpenId)
 						}
@@ -395,7 +395,7 @@
 					content: msg,
 					time: 2,
 					end: function() {
-						if (callBack) {
+						if(callBack) {
 							callBack();
 						}
 					}
@@ -443,7 +443,7 @@
 		width: 100%;
 		height: 100%;
 	}
-
+	
 	.content {
 		width: 100%;
 		height: 100%;
@@ -451,5 +451,6 @@
 		background: #E1E8FB;
 		overflow-y: auto;
 		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
 	}
 </style>
