@@ -22,7 +22,20 @@ export default new Router({
 			component: Home,
 			meta: {
 				navShow: true,
-				needReload: false,
+				needReload: true,
+				keepAlive: true,
+				scollTopPosition: 0
+			}
+		},
+		{
+			path: '/Home',
+			name: 'Home',
+			component: Home,
+			meta: {
+				navShow: true,
+				needReload: true,
+				keepAlive: true,
+				scollTopPosition: 0
 			}
 		},
 		{
@@ -30,7 +43,8 @@ export default new Router({
 			name: 'businessDetal',
 			component: businessDetal,
 			meta: {
-				navShow: false
+				navShow: false,
+				keepAlive: true
 			},
 			params: {
 				listMsg: ""
@@ -41,7 +55,8 @@ export default new Router({
 			name: 'Cart',
 			component: Cart,
 			meta: {
-				navShow: true
+				navShow: true,
+				keepAlive: true
 			}
 		},
 		{
@@ -49,7 +64,8 @@ export default new Router({
 			name: 'cartDetail',
 			component: cartDetail,
 			meta: {
-				navShow: false
+				navShow: false,
+				keepAlive: true
 			}
 		},
 		{
@@ -57,7 +73,8 @@ export default new Router({
 			name: 'MyFile',
 			component: MyFile,
 			meta: {
-				navShow: true
+				navShow: true,
+				keepAlive: true
 			}
 		},
 		{
@@ -65,7 +82,8 @@ export default new Router({
 			name: 'MineMsg',
 			component: MineMsg,
 			meta: {
-				navShow: false
+				navShow: false,
+				keepAlive: true
 			}
 		},
 		{
@@ -73,7 +91,10 @@ export default new Router({
 			name: 'myBusiness',
 			component: myBusiness,
 			meta: {
-				navShow: false
+				navShow: false,
+				needReload: true,
+				keepAlive: true,
+				scollTopPosition:0
 			}
 		}
 	]

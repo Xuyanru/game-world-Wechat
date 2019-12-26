@@ -132,6 +132,13 @@
 				return Promise.reject(error);
 			});
 
+			$("body").on("blur", "input", function() {
+				setTimeout(function() {
+					window.scrollTo(0, document.body.scrollTop + 1);
+					document.body.scrollTop >= 1 && window.scrollTo(0, document.body.scrollTop - 1);
+				}, 10);
+			});
+
 			this.getBasicUrlFun(this.getUserInfo);
 
 			// this.getBasicUrlFun(me.getAllParam);
@@ -415,7 +422,14 @@
 					content: msg,
 					shadeClose: false
 				});
-			}
+			},
+			//文本框blur后页面回到顶部
+			scrollToTop() {
+				setTimeout(function() {
+					window.scrollTo(0, document.body.scrollTop + 1);
+					document.body.scrollTop >= 1 && window.scrollTo(0, document.body.scrollTop - 1);
+				}, 10);
+			},
 
 		},
 		// 监听路由跳转

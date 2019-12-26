@@ -1,7 +1,7 @@
 <template>
 	<div id="myBusiness">
 		<!--售卖商品列表-->
-		<div class="infinite-list-wrapper search-list" style="overflow:auto">
+		<div id="infiniteList2" class="infinite-list-wrapper search-list" style="overflow:auto">
 			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
 				<li class="clear" @click="gotoDetail(item)" v-for="(item,index) in dataList">
 					<el-card>
@@ -152,6 +152,8 @@
 							//return false 开启该代码可禁止点击该按钮关闭
 						}
 					});
+				} else {
+					this.changeStatusFun(idx, theIdx, listDetail);
 				}
 			},
 			//改变商品状态
@@ -193,8 +195,15 @@
 				return this.loading || this.noMore
 			}
 		},
+		beforeRouteEnter(to, from, next) {
+			next(vm => {
+				//				if(from.path === "xxx") {
+				document.getElementById('infiniteList2').scrollTop = to.meta.scollTopPosition;
+				//				}
+			});
+		},
 		beforeRouteLeave(to, from, next) {
-
+			from.meta.scollTopPosition = document.getElementById("infiniteList2").scrollTop;
 			next()
 		},
 		created() {

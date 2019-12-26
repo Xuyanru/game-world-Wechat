@@ -298,6 +298,7 @@
 			},
 			//发布物品
 			comfirmGoods: function() {
+				this.$parent.layerShow("正在提交信息");
 				console.log(this.theDate)
 				this.$ajax.post("sellManage/sellGoods", this.theDate, {
 						timeout: 1000 * 5

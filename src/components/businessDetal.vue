@@ -76,6 +76,7 @@
 			}
 		},
 		beforeRouteLeave(to, from, next) {
+			to.meta.needReload=false;
 			this.init();
 			next()
 		},

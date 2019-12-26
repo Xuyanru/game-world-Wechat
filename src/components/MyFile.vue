@@ -49,7 +49,10 @@
 		},
 
 		beforeRouteLeave(to, from, next) {
-
+			if(to.name=="myBusiness"){
+				to.meta.needReload=true;
+				to.meta.scollTopPosition=0;
+			}
 			next()
 		},
 		created() {

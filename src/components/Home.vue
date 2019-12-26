@@ -1,5 +1,10 @@
 <template>
 	<div id="home">
+		<el-carousel height="10rem">
+			<el-carousel-item v-for="item in 4" :key="item">
+				<img src="../../static/img/002_03.png" alt="" />
+			</el-carousel-item>
+		</el-carousel>
 		<el-row class="top-select" :gutter="1">
 			<el-col :span="8">
 				<el-select v-model="theDate.gameid" placeholder="游戏名称">
@@ -38,7 +43,7 @@
 			</el-col>
 		</el-row>
 		<!--售卖商品列表-->
-		<div class="infinite-list-wrapper search-list" style="overflow:auto">
+		<div id="infiniteList1" class="infinite-list-wrapper search-list" style="overflow:auto;">
 			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
 				<li class="clear" @click="gotoDetail(item,)" v-for="(item,index) in dataList">
 					<el-card class="clear">
@@ -329,29 +334,33 @@
 			}
 		},
 		watch: { //
-			'theDate.gameid' (val) {
+			'theDate.gameid' (val, oldVal) {
 				if(val) {
 					this.getAreaList();
 					this.getGroupList();
+					if(!oldVal) return;
 					this.initGetGoods();
 				}
 
 			},
-			'theDate.areaid' (val) {
+			'theDate.areaid' (val, oldVal) {
+				if(!oldVal) return;
 				this.initGetGoods();
 			},
 			//
-			'theDate.groupid' (val) {
+			'theDate.groupid' (val, oldVal) {
 				if(val) {
 					this.getTypeList();
+					if(!oldVal) return;
 					this.initGetGoods();
 				}
 			},
 			//
-			'theDate.equipmenttypeid' (val) {
+			'theDate.equipmenttypeid' (val, oldVal) {
 				if(val) {
 					this.getNameList();
 					this.getPropertyList();
+					if(!oldVal) return;
 					this.initGetGoods();
 				}
 			},
@@ -361,16 +370,30 @@
 				}
 			},
 		},
+		beforeRouteEnter(to, from, next) {
+			next(vm => {
+				//				if(from.path === "xxx") {
+				document.getElementById('infiniteList1').scrollTop = to.meta.scollTopPosition;
+				//				}
+			});
+		},
 		beforeRouteLeave(to, from, next) {
-
+			from.meta.scollTopPosition = document.getElementById("infiniteList1").scrollTop;
 			next()
 		},
 		created() {
 			this.isFirstEnter = true;
 		},
 		activated() {
-			this.$parent.getBasicUrlFun(this.getGameList);
-			this.$route.meta.needReload = true;
+			if(this.$route.meta.needReload) {
+				this.$parent.getBasicUrlFun(this.getGameList);
+				this.$route.meta.needReload = true;
+				setTimeout(() => {
+					if(this.dataList.length == 0) {
+						this.initGetGoods();
+					}
+				}, 3000)
+			}
 		},
 		mounted() {
 			// this.$parent.getBasicUrlFun(this.getGameList);
@@ -404,7 +427,7 @@
 		height: 100%;
 		font-size: 14px;
 		color: #606266;
-		border:0;
+		border: 0;
 		border-radius: 4px;
 		background-color: #FFF;
 		padding-right: 0.6rem;

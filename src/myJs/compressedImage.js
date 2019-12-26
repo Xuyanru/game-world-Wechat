@@ -28,6 +28,7 @@ export function compressedImage(theSrc, callBack) {
 		ctx.drawImage(image, 0, 0, expectWidth, expectHeight);
 		var base64 = null;
 		base64 = canvas.toDataURL("image/jpeg", 0.5);
+		console.log(base64);
 		callBack(base64);
 	};
 }
