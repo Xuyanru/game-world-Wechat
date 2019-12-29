@@ -1,7 +1,7 @@
 <template>
 	<div id="App">
 		<Tabs v-show="$route.meta.navShow"></Tabs>
-		<div class="content">
+		<div class="content" :class="{'hasTab':$route.meta.navShow}">
 			<keep-alive>
 				<router-view></router-view>
 			</keep-alive>
@@ -452,19 +452,33 @@
 <style>
 	#App {
 		font-family: 'Avenir', Helvetica, Arial, sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
+		/*-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;*/
 		width: 100%;
 		height: 100%;
 	}
 	
 	.content {
+		position: static;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
 		width: 100%;
 		height: 100%;
-		padding-bottom: 3rem;
+		padding-bottom: 0;
 		background: #E1E8FB;
-		overflow-y: auto;
+		overflow-y: hidden;
 		overflow-x: hidden;
 		-webkit-overflow-scrolling: touch;
 	}
+	
+	.content.hasTab {
+		padding-bottom: 3rem;
+	}
+	
+	/*.content>div {
+		height: 100%;
+		overflow-y: auto;
+	}*/
 </style>

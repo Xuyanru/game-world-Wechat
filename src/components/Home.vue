@@ -1,50 +1,53 @@
 <template>
 	<div id="home">
-		<el-carousel height="10rem">
+		<mescroll-vue class="search-list" ref="mescroll" id="" :up="mescrollUp" @init="mescrollInit">
+			<div class="banner">
+				<img class="full-parent" src="../../static/img/002_03.png" alt="" />
+			</div>
+			<!--<el-carousel height="10rem">
 			<el-carousel-item v-for="item in 4" :key="item">
 				<img src="../../static/img/002_03.png" alt="" />
 			</el-carousel-item>
-		</el-carousel>
-		<el-row class="top-select" :gutter="1">
-			<el-col :span="8">
-				<el-select v-model="theDate.gameid" placeholder="游戏名称">
-					<el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id">
-					</el-option>
-				</el-select>
-			</el-col>
-			<el-col :span="8">
-				<el-select v-model="theDate.areaid" placeholder="游戏社区">
-					<el-option v-for="item in areaList" :key="item.id" :label="item.areaname" :value="item.id">
-					</el-option>
-				</el-select>
-			</el-col>
-			<el-col :span="8">
-				<el-select v-model="theDate.groupid" placeholder="商品分组">
-					<el-option v-for="item in groupList" :key="item.id" :label="item.groupName" :value="item.id">
-					</el-option>
-				</el-select>
-			</el-col>
-			<el-col :span="8">
-				<el-select v-model="theDate.equipmenttypeid" placeholder="装备类型">
-					<el-option v-for="item in typeList" :key="item.id" :label="item.typename" :value="item.id">
-					</el-option>
-				</el-select>
-			</el-col>
-			<el-col :span="8">
-				<el-select v-model="theDate.equipmentnameid" placeholder="装备名称">
-					<el-option v-for="item in nameList" :key="item.id" :label="item.equipmentname" :value="item.id">
-					</el-option>
-				</el-select>
-			</el-col>
-			<el-col :span="8">
-				<span @click="drawer=true">
+		</el-carousel>-->
+			<el-row class="top-select" :gutter="1">
+				<el-col :span="8">
+					<el-select v-model="theDate.gameid" placeholder="游戏名称">
+						<el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id">
+						</el-option>
+					</el-select>
+				</el-col>
+				<el-col :span="8">
+					<el-select v-model="theDate.areaid" placeholder="游戏社区">
+						<el-option v-for="item in areaList" :key="item.id" :label="item.areaname" :value="item.id">
+						</el-option>
+					</el-select>
+				</el-col>
+				<el-col :span="8">
+					<el-select v-model="theDate.groupid" placeholder="商品分组">
+						<el-option v-for="item in groupList" :key="item.id" :label="item.groupName" :value="item.id">
+						</el-option>
+					</el-select>
+				</el-col>
+				<el-col :span="8">
+					<el-select v-model="theDate.equipmenttypeid" placeholder="装备类型">
+						<el-option v-for="item in typeList" :key="item.id" :label="item.typename" :value="item.id">
+						</el-option>
+					</el-select>
+				</el-col>
+				<el-col :span="8">
+					<el-select v-model="theDate.equipmentnameid" placeholder="装备名称">
+						<el-option v-for="item in nameList" :key="item.id" :label="item.equipmentname" :value="item.id">
+						</el-option>
+					</el-select>
+				</el-col>
+				<el-col :span="8">
+					<span @click="drawer=true">
 					筛选
 				</span>
-			</el-col>
-		</el-row>
-		<!--售卖商品列表-->
-		<div id="infiniteList1" class="infinite-list-wrapper search-list" style="overflow:auto;">
-			<ul class="list" v-infinite-scroll="getSellGoods" infinite-scroll-disabled="disabled">
+				</el-col>
+			</el-row>
+			<!--售卖商品列表-->
+			<ul id="dataList" class="list">
 				<li class="clear" @click="gotoDetail(item,)" v-for="(item,index) in dataList">
 					<el-card class="clear">
 						<div class="lf list-img">
@@ -80,11 +83,9 @@
 						</div>
 					</el-card>
 				</li>
-				<!--<li v-for="i in count" class="list-item">{{ i }}</li>-->
 			</ul>
-			<p v-if="loading" align="center">加载中...</p>
-			<p v-if="noMore" align="center">没有更多了</p>
-		</div>
+		</mescroll-vue>
+
 		<!--右侧抽屉搜索-->
 		<el-drawer :visible.sync="drawer" size="80%" :with-header="false">
 			<h4>选择搜索的属性</h4>
@@ -105,10 +106,46 @@
 </template>
 
 <script>
+	import MescrollVue from 'mescroll.js/mescroll.vue'
 	export default {
 		name: 'Home',
+		components: {
+			MescrollVue
+		},
 		data() {
 			return {
+				mescroll: null, // mescroll实例对象
+				mescrollUp: {
+					callback: this.getGoodsFun, // 上拉回调,此处可简写; 相当于 callback: function (page, mescroll) { getListData(page); }
+					hardwareClass: 'mescroll-hardware',
+					mustToTop: true,
+					page: {
+						num: 0, // 当前页码,默认0,回调之前会加1,即callback(page)会从1开始
+						size: 10 // 每页数据的数量
+					},
+					noMoreSize: 3, // 如果列表已无数据,可设置列表的总数量要大于等于5条才显示无更多数据;避免列表数据过少(比如只有一条数据),显示无更多数据会不好看
+					//					isBounce: false,
+					toTop: {
+						duration: 100, // 回到顶部的动画时长,默认300ms
+						src: '../../static/img/mescroll-totop.png' // 回到顶部按钮的图片路径,支持网络图
+					},
+					empty: {
+						// 列表第一页无任何数据时,显示的空提示布局; 需配置warpId才生效;
+						warpId: 'dataList', // 父布局的id;
+						icon: '../../static/img/mescroll-empty.png', // 图标,支持网络图
+						tip: '暂无相关数据~', // 提示
+						btntext: '去逛逛 >', // 按钮,默认""
+						btnClick() { // 点击按钮的回调,默认null
+							alert('点击了按钮,具体逻辑自行实现')
+						}
+					},
+					onScroll: function(mescroll, y, isUp) {
+						console.log(y);
+					},
+					lazyLoad: {
+						use: true // 是否开启懒加载,默认false
+					}
+				},
 				theDate: {
 					gameid: "",
 					areaid: "",
@@ -128,7 +165,6 @@
 				pageSize: 10,
 				dataList: [], //商品列表
 				count: 0, //记录总条数
-				loading: false,
 
 				startDate: "",
 				noListWarn: false,
@@ -136,6 +172,9 @@
 			}
 		},
 		methods: {
+			mescrollInit(mescroll) {
+				this.mescroll = mescroll
+			},
 			//点赞或取消点赞操作
 			supportFun: function(theDetail, idx) {
 				if(theDetail.isSupport == 0) {
@@ -280,38 +319,46 @@
 			},
 			//获取商品列表
 			getSellGoods: function() {
-				if(this.loading) {
-					return
-				}
-				this.loading = true;
 				//				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
-				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, {}, {
+				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.mescrollUp.page.num + "&pageSize=" + this.mescrollUp.page.size, {}, {
 						timeout: 1000 * 15
 					})
 					.then((data) => {
 						console.log(data);
-						if(data.code == 1000 && data.content.length > 0) {
-							this.count = data.count;
-							if(this.pageNo == 1) {
-								this.dataList = data.content;
-							} else {
-								this.dataList = this.dataList.concat(data.content);
+						//						if(data.code == 1000 && data.content.length > 0) {
+						if(data.code == 1000) {
+							if(this.mescrollUp.page.num === 1) {
+								this.dataList = []
 							}
-							this.pageNo++;
-							this.loading = false;
+							// 把请求到的数据添加到列表
+							this.dataList = this.dataList.concat(data.content)
+							// 数据渲染成功后,隐藏下拉刷新的状态
+							this.$nextTick(() => {
+								this.mescroll.endSuccess(data.content.length)
+							})
+							//							this.pageNo++;
 							console.log(this.dataList);
-						} else if(data.code == 1000 && data.content == 0) {
-							this.count = data.count;
-						} else {
+						}
+						//						else if(data.code == 1000 && data.content == 0) {
+						//							this.count = data.count;
+						//						} 
+						else {
+							this.mescroll.endErr();
 							this.$parent.layerTimeout(data.msg);
 							this.count = 0;
 							return false
 						}
+
+					}).catch((error) => {
+						this.mescroll.endErr();
 					})
 			},
-			initGetGoods: function() {
+			getGoodsFun: function() {
+				this.$parent.getBasicUrlFun(this.getSellGoods);
+			},
+			initGetGoods: function(done) {
 				this.pageNo = 1;
-				this.getSellGoods();
+				this.getSellGoods(done);
 				if(this.drawer) {
 					this.drawer = false;
 				}
@@ -324,14 +371,10 @@
 					}
 				});
 			},
+			finishRefresh: function() {},
 		},
 		computed: {
-			noMore() {
-				return this.dataList.length >= this.count;
-			},
-			disabled() {
-				return this.loading || this.noMore
-			}
+
 		},
 		watch: { //
 			'theDate.gameid' (val, oldVal) {
@@ -339,20 +382,20 @@
 					this.getAreaList();
 					this.getGroupList();
 					if(!oldVal) return;
-					this.initGetGoods();
+					this.mescroll.resetUpScroll() // 刷新列表数据this.initGetGoods();
 				}
 
 			},
 			'theDate.areaid' (val, oldVal) {
 				if(!oldVal) return;
-				this.initGetGoods();
+				this.mescroll.resetUpScroll() // 刷新列表数据
 			},
 			//
 			'theDate.groupid' (val, oldVal) {
 				if(val) {
 					this.getTypeList();
 					if(!oldVal) return;
-					this.initGetGoods();
+					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
 			//
@@ -361,24 +404,24 @@
 					this.getNameList();
 					this.getPropertyList();
 					if(!oldVal) return;
-					this.initGetGoods();
+					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
 			'theDate.equipmentnameid' (val) {
 				if(val) {
-					this.initGetGoods();
+					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
 		},
-		beforeRouteEnter(to, from, next) {
+		beforeRouteEnter(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteEnter不用写
 			next(vm => {
-				//				if(from.path === "xxx") {
-				document.getElementById('infiniteList1').scrollTop = to.meta.scollTopPosition;
-				//				}
-			});
+				// 找到当前mescroll的ref,调用子组件mescroll-vue的beforeRouteEnter方法
+				vm.$refs.mescroll && vm.$refs.mescroll.beforeRouteEnter() // 进入路由时,滚动到原来的列表位置,恢复回到顶部按钮和isBounce的配置
+			})
 		},
-		beforeRouteLeave(to, from, next) {
-			from.meta.scollTopPosition = document.getElementById("infiniteList1").scrollTop;
+		beforeRouteLeave(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteLeave不用写
+			// 找到当前mescroll的ref,调用子组件mescroll-vue的beforeRouteEnter方法
+			this.$refs.mescroll && this.$refs.mescroll.beforeRouteLeave() // 退出路由时,记录列表滚动的位置,隐藏回到顶部按钮和isBounce的配置
 			next()
 		},
 		created() {
@@ -388,11 +431,11 @@
 			if(this.$route.meta.needReload) {
 				this.$parent.getBasicUrlFun(this.getGameList);
 				this.$route.meta.needReload = true;
-				setTimeout(() => {
-					if(this.dataList.length == 0) {
-						this.initGetGoods();
-					}
-				}, 3000)
+				//				setTimeout(() => {
+				//					if(this.dataList.length == 0) {
+				//						this.initGetGoods();
+				//					}
+				//				}, 3000)
 			}
 		},
 		mounted() {
@@ -404,9 +447,26 @@
 </script>
 
 <style>
-	#home {}
+	#home .banner {
+		width: 100%;
+		height: 6rem;
+	}
+	
+	.mescroll {
+		position: fixed;
+		top: 0;
+		bottom: 3rem;
+		height: auto;
+		/*如设置bottom:50px,则需height:auto才能生效*/
+	}
+	
+	.mescroll-totop{
+		bottom:4rem
+	}
 	
 	#home .top-select {
+		width: 100%;
+		overflow: hidden;
 		/*font-size: 0.8rem;
 		line-height: 40px;*/
 		text-align: center;
@@ -418,7 +478,7 @@
 	
 	#home .el-row.top-select .el-col:last-child {
 		padding-left: 0;
-		line-height: 40px;
+		line-height: 2rem;
 	}
 	
 	#home .el-row.top-select .el-col:last-child span {
@@ -465,10 +525,8 @@
 		font-size: .8rem;
 		line-height: 1rem;
 		overflow: hidden;
+		white-space: nowrap;
 		text-overflow: ellipsis;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
 		padding-top: .2rem;
 		height: 1.5rem
 	}

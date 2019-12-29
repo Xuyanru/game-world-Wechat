@@ -375,7 +375,7 @@
 	
 	#Cart .el-row.top-select .el-col:last-child {
 		padding-left: 0;
-		line-height: 40px;
+		line-height: 2rem;
 	}
 	
 	#Cart .el-row.top-select .el-col:last-child span {
