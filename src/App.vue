@@ -3,7 +3,7 @@
 		<Tabs v-show="$route.meta.navShow"></Tabs>
 		<div class="content" :class="{'hasTab':$route.meta.navShow}">
 			<keep-alive>
-				<router-view></router-view>
+				<router-view ref="child"></router-view>
 			</keep-alive>
 		</div>
 	</div>
@@ -27,6 +27,7 @@
 		},
 		data() {
 			return {
+				transitionName: '',
 				theUserCode: "", //用户code
 				areacode: "6666", //区域参数
 				userType: null, //用户性质 0:员工、1:访客、2:推送页面
@@ -43,34 +44,25 @@
 			}
 		},
 		mounted() {
-			console.log(this.$getPathName);
-
-			// sessionStorage.setItem("openId", "o5Qtn566LlTjA5AHibqPG-I6p63w");
-
-			//									sessionStorage.setItem("openId", "ooZz01Zpaifeq-hhvicr4eKl6-nc");
-			//							15864789654
-
-			//						sessionStorage.setItem("openId", "oELkj1QA4yeM6zS05I63LceBwDIQ");
-			//							"13931021490"
-			//
-			//员工
-			//			sessionStorage.setItem("openId", "ooZz01R3DuIQkAhf3SY5rwy-CvOw");
-
-			//						sessionStorage.setItem("openId", "owO-_vhfW2GpWKB03CF0ReVr58Xw");
-			//							15732139883
-			//			sessionStorage.setItem("openId", "owO-_vv1lME25yNjI3i9IR8qKJkk");
-
-			//															sessionStorage.setItem("openId", "owO-_vur-rxelvR-87KsbE0DQbV4");
-			//									sessionStorage.setItem("openId", "E63B3DFC-4192-435F-B384-01656498262C");
-
-			// sessionStorage.setItem("areacode", "6666");
 			var me = this;
 			axios.interceptors.request.use(function(config) {
-				console.log(axios.defaults.baseURL);
-				// Do something before request is sent
-				//								 var time = new Date().getTime();
-				config.headers.userGuid = "111111";
-				// config.headers.token = md5(me.mid + me.code + time + "toB");
+				console.log(config);
+				if(config.url.search("wxChat/getUser") == -1 && config.url.search("./static/configData/config.json") == -1) {
+					var guid = "";
+					if(me.vBasicMsg) {
+						guid = me.vBasicMsg.guid;
+					} else if(sessionStorage.getItem("vBasicMsg")) {
+						guid = JSON.parse(sessionStorage.getItem("vBasicMsg")).guid;
+					} else {
+						me.layerShow("请求有误，请尝试重新进入该链接");
+					}
+					config.headers.userGuid = guid;
+					// config.headers.userGuid = "111111";
+				}
+				
+				if(config.url.search("./static/configData/config.json") != -1){
+					config.baseURL="";
+				}
 				return config;
 			}, function(error) {
 				me.layerErrorTimeout("请求超时");
@@ -138,15 +130,46 @@
 					document.body.scrollTop >= 1 && window.scrollTo(0, document.body.scrollTop - 1);
 				}, 10);
 			});
+//
+			var theBasicMsg = {
+				"guid": "ff6f9086-ef08-4dcf-b101-65a237039386",
+				"phone": "15830733627",
+				"headerimg": "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLSrpu0ZJm6p6c8n0ajPA56UgqYIcIworawMwmMtoFQKkHlZVB6nQt0hupUMmO88ReoSibtJEfdhBQ/132",
+				"photo": null,
+				"pid": "1dasda",
+				"qq": "1564564564",
+				"wechat": "dsds",
+				"gameid": 1,
+				"areaid": 1,
+				"sex": 2,
+				"city": "邯郸",
+				"province": "河北",
+				"country": "中国",
+				"nickname": "汝",
+				"remark": null,
+				"level": 1,
+				"score": 0,
+				"onlinetime": "每天",
+				"motto": "vfdvfdvd",
+				"mottocheck": 1,
+				"pidcheck": 0,
+				"qqcheck": 0,
+				"wechatcheck": 0,
+				"phonecheck": 0,
+				"usernum": 12270207,
+				"admin": 0,
+				"email": null
+			}
+			sessionStorage.setItem("vBasicMsg", JSON.stringify(theBasicMsg));
+			this.getBasicUrlFun(this.$refs.child.getGameList);
 
-			this.getBasicUrlFun(this.getUserInfo);
+			this.getBasicUrlFun();
 
-			// this.getBasicUrlFun(me.getAllParam);
+			this.getBasicUrlFun(this.getAllParam);
 		},
 		methods: {
 			getBasicUrlFun: function(callBack) {
 				var me = this;
-				this.$ajax.defaults.baseURL = "";
 				this.$ajax.get('./static/configData/config.json').then((response) => {
 					if(response.data) {
 						me.$ajax.defaults.baseURL = response.data.theUrl;
@@ -154,7 +177,9 @@
 						me.$ajax.defaults.baseURL = response.theUrl;
 					}
 					me.baseURL = me.$ajax.defaults.baseURL;
-					callBack();
+					if(callBack) {
+						callBack();
+					}
 				})
 			},
 			//获取用户信息
@@ -222,176 +247,68 @@
 				}
 			},
 
-			//获取用户的openid
-			getUserOpenId: function() {
+			//获取用户的信息
+			getMsgByCode: function() {
 				var me = this;
-				var sendMsg = {
-					code: me.theUserCode,
-					areacode: "6666",
+				var code = this.theUserCode ? this.theUserCode : sessionStorage.getItem("code");
+				if(!code) return;
+				this.$ajax.get("wxChat/getUser?code=" + code, {
+						timeout: 1000 * 5
+					})
+					.then((data) => {
+						console.log(data);
+						if(data.code == 1000 && data.content) {
+							me.vBasicMsg = data.content;
+							sessionStorage.setItem("vBasicMsg", JSON.stringify(data.content));
+							if(me.$route.name == "Home") {
+								me.getBasicUrlFun(me.$refs.child.getGameList);
+								me.getBasicUrlFun(me.getNotify);
+							}
+						} else {
+							me.layerShow("请求有误，请尝试重新进入该链接");
+							return false
+						}
+					})
+			},
+			//获取用户code等基本参数
+			getAllParam: function() {
+				if(!sessionStorage.getItem("vBasicMsg")) {
+					this.getMsgByUrl();
+					this.getBasicUrlFun(this.getMsgByCode);
 				}
-				this.$ajax.post("wxmanager/getopenid", sendMsg, {
-						timeout: 1000 * 5
-					})
-					.then(function(response) {
-						console.log(response);
-						if(response.status == 200) {
-							var data = response.data;
-							if(data.code == 0) {
-								me.openId = data.openid;
-								me.wxBasicMsg = data;
-								if(me.isTuisong) {
-									me.tuisongUrl = window.location.href
-								}
-								//								me.layerShow("正在加载");
-								openId = me.openId;
-								axios.defaults.headers.openId = openId;
-								me.userMsg = data;
-								sessionStorage.setItem("openId", me.openId);
-								sessionStorage.setItem("userMsg", JSON.stringify(me.userMsg))
-								me.getUserType();
-							} else {
-								me.layerShow("请求有误，请尝试重新进入该链接");
-								return false
-							}
-						}
-					})
 			},
-
-			//判断用户是否已经登录或注册过
-			visitorSys: function() {
-				//访客基本信息
-				this.vBasicMsg = "";
-				//访客基本信息
-				this.theUrl = "wxuser/isLogin";
-				var me = this;
-				// alert(axios.defaults.headers.openId);
-				this.$ajax.get("wxuser/isLogin", {
-						timeout: 1000 * 5
-					})
-					.then(function(response) {
-						console.log(response);
-						if(response.status == 200) {
-							var data = response.data;
-							if(data.code == 1000) {
-								me.vBasicMsg = data.content;
-								if(data.content.areacode) {
-									me.areacode = data.content.areacode;
-									areacode = me.areacode;
-									// axios.defaults.headers.areaCode = areacode;
-									sessionStorage.setItem("areacode", me.areacode);
-								}
-								sessionStorage.setItem("vBasicMsg", JSON.stringify(me.vBasicMsg));
-								thisurl = window.location.href;
-								me.tuisongUrl = "";
-								me.$router.push("/");
-								sessionStorage.setItem("userType", me.userType);
-							} else {
-								if(data.code == 2000) {
-									me.layerTimeout("请先补全信息再预约");
-									me.$router.push("/Me");
-								} else {
-									me.layerShow()
-								}
-							}
-						}
-					});
-
-				//				me.layerShow("正在加载")
-			},
-
 			//更新访客信息
 			refreshMsg(theMsg) {
 				var me = this;
 				me.vBasicMsg = theMsg;
-				if(theMsg.areacode) {
-					me.areacode = theMsg.areacode;
-					areacode = me.areacode;
-					// axios.defaults.headers.areaCode = areacode;
-					sessionStorage.setItem("areacode", me.areacode);
-				}
 				sessionStorage.setItem("vBasicMsg", JSON.stringify(me.vBasicMsg));
-				// thisurl = window.location.href;
-				// me.tuisongUrl = "";
-				// me.$router.push("/");
-				// sessionStorage.setItem("userType", me.userType);
-			},
-
-			/**判断用户是否登录过**/
-			getUserType: function() {
-				this.visitorSys()
-			},
-
-			//获取用户code等基本参数
-			getAllParam: function() {
-				if(sessionStorage.getItem("openId")) {
-					if(sessionStorage.getItem("areacode") && sessionStorage.getItem("userType")) {
-						this.areacode = sessionStorage.getItem("areacode");
-						areacode = this.areacode;
-						this.openId = sessionStorage.getItem("openId");
-						openId = this.openId;
-						axios.defaults.headers.openId = openId;
-						// axios.defaults.headers.areaCode = areacode;
-						this.syncid = sessionStorage.getItem("syncid");
-						this.vBasicMsg = JSON.parse(sessionStorage.getItem("vBasicMsg"));
-						this.userType = sessionStorage.getItem("userType");
-						this.userMsg = JSON.parse(sessionStorage.getItem("userMsg"));
-						if(sessionStorage.getItem("activeOpenId")) {
-							this.activeOpenId = sessionStorage.getItem("activeOpenId")
-						}
-						if(this.$route.name == "examinationList") {
-							this.$refs.theRouter.getList();
-						}
-					} else {
-						this.openId = sessionStorage.getItem("openId");
-						openId = this.openId;
-						axios.defaults.headers.openId = openId;
-
-						//删除
-						// this.areacode = sessionStorage.getItem("areacode");
-						// areacode = this.areacode;
-						// axios.defaults.headers.areaCode = areacode;
-
-						this.getMsgByUrl();
-						this.getUserType()
-					}
-				} else {
-					this.getMsgByUrl();
-					this.getUserOpenId()
-				}
 			},
 
 			//通过地址获取信息
 			getMsgByUrl: function() {
-				this.state = this.GetUrlParam("state");
-				console.log(this.state);
-				if(this.state) {
+				if(this.GetUrlParam("code")) {
 					this.theUserCode = this.GetUrlParam("code");
-					var theLastIdx = this.state.lastIndexOf("#/");
-					if(theLastIdx != -1) {
-						var params = this.state.slice(0, theLastIdx).split("!")
-					} else {
-						var params = this.state.split("!")
-					}
-					thisurl = window.location.href;
-					if(!this.theUserCode) {
-						me.layerErrorTimeout("请求错误");
-						return false
-					}
-					if(params[1] == 2) {
-						this.isTuisong = true;
-						if(params[2]) {
-							this.syncid = params[2];
-							sessionStorage.setItem("syncid", this.syncid)
-						}
-						if(params[3]) {
-							this.activeOpenId = params[3];
-							sessionStorage.setItem("activeOpenId", this.activeOpenId)
-						}
-					} else {
-						this.isTuisong = false
-					}
-					console.log(this.userType)
+					sessionStorage.setItem("code", this.theUserCode);
+				} else {
+					this.layerShow("请求有误，请尝试重新进入该链接");
 				}
+			},
+			//获取公告信息
+			getNotify: function() {
+				this.$ajax.get("notify/home", {
+						timeout: 1000 * 20
+					})
+					.then((data) => {
+						console.log(data);
+						if(data.code == 1000 && data.content) {
+							var theCon=data.content;
+							layer.open({
+								title: theCon.title,
+								content: "<p>"+theCon.content+"</p><p style='text-align:right'>"+theCon.createdate+"</p>",
+								btn: ['确定'],
+							});
+						}
+					})
 			},
 			//改变用户基本信息
 			changeBasicMsg(sendMsg) {
@@ -441,7 +358,13 @@
 					console.log(this.$route);
 					var me = this;
 					// 如果to索引大于from索引,判断为前进状态,反之
-
+					// if (to.meta.index > from.meta.index) {
+					//   this.transitionName = 'slide-left';
+					// } else if (to.meta.index < from.meta.index) {
+					//   this.transitionName = 'slide-right';
+					// } else {
+					//   this.transitionName = '';
+					// }
 				},
 				// 深度观察监听
 				deep: true
@@ -467,7 +390,7 @@
 		width: 100%;
 		height: 100%;
 		padding-bottom: 0;
-		background: #E1E8FB;
+		background: #EFEFEF;
 		overflow-y: hidden;
 		overflow-x: hidden;
 		-webkit-overflow-scrolling: touch;
@@ -477,8 +400,7 @@
 		padding-bottom: 3rem;
 	}
 	
-	/*.content>div {
+	.content>div#Cart {
 		height: 100%;
-		overflow-y: auto;
-	}*/
+	}
 </style>

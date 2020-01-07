@@ -1,7 +1,7 @@
 <template>
 	<div id="businessDetal">
 		<div class="banner">
-			<img :src="$parent.baseURL+theDetail.bigimg" alt="" />
+			<img class="absolute-center" :src="$parent.baseURL+theDetail.bigimg" fit="contain" alt="" />
 		</div>
 		<div class="listMsg">
 			<h3>{{theDetail.title}}</h3>
@@ -20,12 +20,14 @@
 					</p>
 					<p>装备价格：
 						<span class="text-danger">{{theDetail.price}}</span>
-						<span class="text-danger" v-if="theDetail.pricetype==0">金币</span>
+						<span class="text-danger" v-if="theDetail.pricetype==3">金币</span>
 						<span class="text-danger" v-if="theDetail.pricetype==1">元宝</span>
 						<span class="text-danger" v-if="theDetail.pricetype==2">RMB</span>
-						<span class="">{{theDetail.isprice==0?"可议价":"不可议价"}}</span>
+						<!--<span class="">{{theDetail.isprice==0?"可议价":"不可议价"}}</span>-->
 					</p>
 					<p>发布时间：{{theDetail.refreshdate}}</p>
+					<p>玩家在线时间：{{theDetail.onlinetime}}</p>
+					<p>玩家个性签名：{{theDetail.motto}}</p>
 					<p>装备说明：{{theDetail.content}}</p>
 				</li>
 			</ul>
@@ -76,7 +78,7 @@
 			}
 		},
 		beforeRouteLeave(to, from, next) {
-			to.meta.needReload=false;
+			to.meta.needReload = false;
 			this.init();
 			next()
 		},
@@ -91,17 +93,24 @@
 
 <style>
 	#businessDetal {
-		padding: 0.5rem;
+		font-size: 0.7rem;
+		padding-bottom: 1rem;
+		height: 100%;
+		overflow: auto;
 	}
 	
 	#businessDetal .banner {
 		width: 100%;
 		height: 10rem;
+		position: relative;
+		background: #FFFFFF;
 	}
 	
 	#businessDetal .banner img {
-		width: 100%;
-		height: 100%;
+		/*width: 100%;
+		height: 100%;*/
+		max-width: 100%;
+		max-height: 100%;
 	}
 	
 	.listMsg {

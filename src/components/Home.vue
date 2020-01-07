@@ -2,7 +2,7 @@
 	<div id="home">
 		<mescroll-vue class="search-list" ref="mescroll" id="" :up="mescrollUp" @init="mescrollInit">
 			<div class="banner">
-				<img class="full-parent" src="../../static/img/002_03.png" alt="" />
+				<img class="full-parent" src="http://www.honghai.fun/euipmentImg/appImg/banner.png" alt="" />
 			</div>
 			<!--<el-carousel height="10rem">
 			<el-carousel-item v-for="item in 4" :key="item">
@@ -42,8 +42,8 @@
 				</el-col>
 				<el-col :span="8">
 					<span @click="drawer=true">
-					筛选
-				</span>
+            筛选
+          </span>
 				</el-col>
 			</el-row>
 			<!--售卖商品列表-->
@@ -60,24 +60,25 @@
 							</p>
 							<p class="line-two">
 								<span class="list-icon" v-for="(val, key, index) in item" v-if='propertyName[key]&&val'>
-									{{key!="sex"?propertyName[key]+val:propertyName[key]+(val==0?"女":"男")}}
-								</span>
+                  {{key!="sex"?propertyName[key]+val:propertyName[key]+(val==0?"女":"男")}}
+                </span>
 							</p>
 							<p class="line-three clear">
 								<span class="lf list-sponsor text-danger">{{item.price}}</span>
-								<span class="text-danger lf" v-if="item.pricetype==0">金币</span>
+								<span class="text-danger lf" v-if="item.pricetype==3">金币</span>
 								<span class="text-danger lf" v-if="item.pricetype==1">元宝</span>
 								<span class="text-danger lf" v-if="item.pricetype==2">RMB</span>
-								<span class="lf list-mumber">{{item.isprice==0?"可议价":"不可议价"}}</span>
+								<!--<span class="lf list-mumber">{{item.isprice==0?"可议价":"不可议价"}}</span>-->
 							</p>
 							<p class="line-four clear">
+								<span class="lf">{{item.equipmentname}}</span>
 								<span class="zan lf" @click.stop="supportFun(item,index)">
-									<i class="notSupport" v-if="item.isSupport==0"></i>
-									<i class="isSupport" v-if="item.isSupport==1"></i>
-								</span>
+                  <i class="notSupport" v-if="item.isSupport==0"></i>
+                  <i class="isSupport" v-if="item.isSupport==1"></i>
+                </span>
 								<span>
-									{{item.support }}
-								</span>
+                  {{item.support }}
+                </span>
 								<span class="rt list-mumber">{{item.refreshdate}}</span>
 							</p>
 						</div>
@@ -100,7 +101,7 @@
 				</el-col>
 
 			</el-form>
-			<el-button type="primary" @click="initGetGoods">确定</el-button>
+			<el-button type="primary" @click="resetGoods">确定</el-button>
 		</el-drawer>
 	</div>
 </template>
@@ -127,21 +128,21 @@
 					//					isBounce: false,
 					toTop: {
 						duration: 100, // 回到顶部的动画时长,默认300ms
-						src: '../../static/img/mescroll-totop.png' // 回到顶部按钮的图片路径,支持网络图
+						src: './static/mescroll/mescroll-totop.png' // 回到顶部按钮的图片路径,支持网络图
 					},
 					empty: {
 						// 列表第一页无任何数据时,显示的空提示布局; 需配置warpId才生效;
 						warpId: 'dataList', // 父布局的id;
-						icon: '../../static/img/mescroll-empty.png', // 图标,支持网络图
+						icon: './static/mescroll/mescroll-empty.png', // 图标,支持网络图
 						tip: '暂无相关数据~', // 提示
-						btntext: '去逛逛 >', // 按钮,默认""
-						btnClick() { // 点击按钮的回调,默认null
-							alert('点击了按钮,具体逻辑自行实现')
-						}
+						// btntext: '去逛逛 >', // 按钮,默认""
+						// btnClick() { // 点击按钮的回调,默认null
+						//   alert('点击了按钮,具体逻辑自行实现')
+						// }
 					},
-					onScroll: function(mescroll, y, isUp) {
-						console.log(y);
-					},
+					//					onScroll: function(mescroll, y, isUp) {
+					//						console.log(y);
+					//					},
 					lazyLoad: {
 						use: true // 是否开启懒加载,默认false
 					}
@@ -167,7 +168,6 @@
 				count: 0, //记录总条数
 
 				startDate: "",
-				noListWarn: false,
 				nolistMsg: "",
 			}
 		},
@@ -186,7 +186,7 @@
 				}
 
 				this.$ajax.get("sellManage/goodsSupport?equipmentGuid=" + theDetail.guid + "&status=" + this.dataList[idx].isSupport, {
-						timeout: 1000 * 5
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
@@ -197,19 +197,19 @@
 			getGameList: function() {
 				//				this.gameList=[{"name":"原始传奇","id":"1"}];
 				//				return;
+				var me = this;
 				this.$ajax.get("game/gameList", {
-						timeout: 1000 * 5
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
-							this.gameList = data.content;
-							this.theDate.gameid = data.content[0].id;
+							me.gameList = data.content;
+							me.theDate.gameid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
-							this.gameList = [];
-							this.noListWarn = true;
+							me.gameList = [];
 						} else {
-							this.$parent.layerTimeout(data.msg);
+							me.$parent.layerTimeout(data.msg);
 							return false
 						}
 					})
@@ -217,7 +217,7 @@
 			//获取区域名称
 			getAreaList: function() {
 				this.$ajax.get("game/areaList?gameId=" + this.theDate.gameid, {
-						timeout: 1000 * 5
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
@@ -226,7 +226,6 @@
 							this.theDate.areaid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.areaList = [];
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -236,17 +235,16 @@
 			//获取分类
 			getGroupList: function() {
 				this.$ajax.get("property/groupList?gameId=" + this.theDate.gameid, {
-						timeout: 1000 * 5
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.groupList = data.content;
 							this.theDate.groupid = data.content[0].id;
-						} else if(data.code == 1000 && data.content == 0) {
+						} else if(data.code == 1000 && data.content.length == 0) {
 							this.groupList = [];
 							this.theDate.groupid = "";
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -255,20 +253,17 @@
 			},
 			//获取装备类型
 			getTypeList: function() {
-				this.$ajax.get("property/typeList?groupId=" + this.theDate.groupid, {
-						timeout: 1000 * 5
+				this.$ajax.get("property/typeList?groupId=" + this.theDate.groupid + "&isAll=1", {
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.typeList = data.content;
 							this.theDate.equipmenttypeid = data.content[0].id;
-						} else if(data.code == 1000 && data.content == 0) {
+						} else if(data.code == 1000 && data.content.length == 0) {
 							this.typeList = [];
 							this.theDate.equipmenttypeid = "";
-							this.nameList = [];
-							this.theDate.equipmentnameid = "";
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -277,18 +272,17 @@
 			},
 			//获取装备名称
 			getNameList: function() {
-				this.$ajax.get("property/nameList?typeId=" + this.theDate.equipmenttypeid, {
-						timeout: 1000 * 5
+				this.$ajax.get("property/nameList?typeId=" + this.theDate.equipmenttypeid + "&isAll=1", {
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
 							this.nameList = data.content;
 							this.theDate.equipmentnameid = data.content[0].id;
-						} else if(data.code == 1000 && data.content == 0) {
+						} else if(data.code == 1000 && data.content.length == 0) {
 							this.nameList = [];
 							this.theDate.equipmentnameid = "";
-							this.nameList = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -301,7 +295,7 @@
 					'equipmentnameid'
 				]));
 				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
-						timeout: 1000 * 5
+						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
@@ -310,7 +304,6 @@
 
 						} else if(data.code == 1000 && data.content == 0) {
 							this.propertyList = [];
-							this.nameList = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -319,10 +312,18 @@
 			},
 			//获取商品列表
 			getSellGoods: function() {
-				//				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.pageNo + "&pageSize=" + this.pageSize, this.theDate, {
-				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.mescrollUp.page.num + "&pageSize=" + this.mescrollUp.page.size, {}, {
-						timeout: 1000 * 15
-					})
+				if(!this.theDate.areaid) return;
+				var sendMsg = {};
+				for(var key in this.theDate) {
+					if(this.theDate[key]) {
+						sendMsg[key] = this.theDate[key];
+					}
+				}
+				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.mescrollUp.page.num + "&pageSize=" + this.mescrollUp
+						.page.size, sendMsg, {
+							//				this.$ajax.post("sellManage/allSellGoods?pageNo=" + this.mescrollUp.page.num + "&pageSize=" + this.mescrollUp.page.size, {}, {
+							timeout: 1000 * 20
+						})
 					.then((data) => {
 						console.log(data);
 						//						if(data.code == 1000 && data.content.length > 0) {
@@ -341,7 +342,7 @@
 						}
 						//						else if(data.code == 1000 && data.content == 0) {
 						//							this.count = data.count;
-						//						} 
+						//						}
 						else {
 							this.mescroll.endErr();
 							this.$parent.layerTimeout(data.msg);
@@ -356,12 +357,9 @@
 			getGoodsFun: function() {
 				this.$parent.getBasicUrlFun(this.getSellGoods);
 			},
-			initGetGoods: function(done) {
-				this.pageNo = 1;
-				this.getSellGoods(done);
-				if(this.drawer) {
-					this.drawer = false;
-				}
+			resetGoods: function() {
+				this.drawer = false;
+				this.mescroll.resetUpScroll();
 			},
 			gotoDetail(list) {
 				this.$router.push({
@@ -378,37 +376,38 @@
 		},
 		watch: { //
 			'theDate.gameid' (val, oldVal) {
-				if(val) {
+				if(val || val == 0) {
 					this.getAreaList();
 					this.getGroupList();
 					if(!oldVal) return;
-					this.mescroll.resetUpScroll() // 刷新列表数据this.initGetGoods();
+					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 
 			},
 			'theDate.areaid' (val, oldVal) {
-				if(!oldVal) return;
+				//				if(!oldVal) return;
 				this.mescroll.resetUpScroll() // 刷新列表数据
 			},
 			//
 			'theDate.groupid' (val, oldVal) {
-				if(val) {
+				if(val || val == 0) {
 					this.getTypeList();
-					if(!oldVal) return;
+					//					if(!oldVal) return;
 					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
 			//
 			'theDate.equipmenttypeid' (val, oldVal) {
-				if(val) {
+				if(val || val == 0) {
 					this.getNameList();
 					this.getPropertyList();
-					if(!oldVal) return;
+					//					if(!oldVal) return;
 					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
 			'theDate.equipmentnameid' (val) {
-				if(val) {
+				if(val || val == 0) {
+					this.getPropertyList();
 					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
@@ -429,13 +428,8 @@
 		},
 		activated() {
 			if(this.$route.meta.needReload) {
-				this.$parent.getBasicUrlFun(this.getGameList);
+				// this.$parent.getBasicUrlFun(this.getGameList);
 				this.$route.meta.needReload = true;
-				//				setTimeout(() => {
-				//					if(this.dataList.length == 0) {
-				//						this.initGetGoods();
-				//					}
-				//				}, 3000)
 			}
 		},
 		mounted() {
@@ -447,6 +441,10 @@
 </script>
 
 <style>
+	#home {
+		height: 100%;
+	}
+	
 	#home .banner {
 		width: 100%;
 		height: 6rem;
@@ -460,8 +458,8 @@
 		/*如设置bottom:50px,则需height:auto才能生效*/
 	}
 	
-	.mescroll-totop{
-		bottom:4rem
+	.mescroll-totop {
+		bottom: 4rem
 	}
 	
 	#home .top-select {
@@ -500,13 +498,18 @@
 	}
 	
 	.search-list ul li {
-		padding: .5rem;
-		border-bottom: 1px solid #999
+		border-bottom: 1px solid #EFEFEF
+	}
+	
+	.search-list ul li .el-card,
+	.search-list ul li .el-card.is-always-shadow {
+		border: none;
+		box-shadow: none;
 	}
 	
 	.search-list ul li .list-img {
-		width: 5.25rem;
-		height: 5.25rem
+		width: 5.2rem;
+		height: 5.2rem
 	}
 	
 	.search-list ul li .list-img img {
@@ -516,30 +519,41 @@
 	}
 	
 	.search-list ul li .list-msg {
-		height: 5.25rem;
-		margin-left: 5.25rem;
+		height: 5.2rem;
+		margin-left: 5.2rem;
 		padding-left: .5rem;
 	}
 	
 	.search-list ul li .list-msg .line-one {
-		font-size: .8rem;
-		line-height: 1rem;
+		font-size: .7rem;
+		line-height: .8rem;
 		overflow: hidden;
-		white-space: nowrap;
 		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 		padding-top: .2rem;
-		height: 1.5rem
+		height: 1.8rem
 	}
 	
 	.search-list ul li .list-msg .line-two,
 	.search-list ul li .list-msg .line-three,
 	.search-list ul li .list-msg .line-four {
-		margin-top: 0.2rem;
-		font-size: .7rem;
+		height: 0.8rem;
+		font-size: .6rem;
 		color: #929292;
+		margin-top: 0.2rem;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis
+	}
+	
+	.search-list ul li .list-msg .line-three {
+		height: 0.8rem;
+	}
+	
+	.search-list ul li .list-msg .line-three .text-danger {
+		font-size: 0.65rem;
 	}
 	
 	.search-list ul li .list-msg .line-three .list-sponsor {
@@ -556,7 +570,8 @@
 	
 	.search-list ul li .list-msg .line-four {
 		line-height: 1.5rem;
-		margin-top: 0.3rem
+		height: 1.5rem;
+		font-size: 0.7rem;
 	}
 	
 	.search-list ul li .list-msg .line-four span.zan {

@@ -1,10 +1,10 @@
 <template>
 	<div id="MyFile">
 		<div id="MyFile-top" class="clear">
-			<el-avatar class="lf" shape="square" fit="fit" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"></el-avatar>
+			<el-avatar class="lf" shape="square" fit="fit" :src="headImg"></el-avatar>
 			<div class="myName lf">
-				<p class="name">开心就好</p>
-				<p class="wechatCode">微信号：</p>
+				<p class="name">{{basicMsg.nickname}}</p>
+				<p class="wechatCode">个性签名：{{basicMsg.motto}}</p>
 			</div>
 		</div>
 		<div class="itemList">
@@ -38,25 +38,28 @@
 		name: 'MyFile',
 		data() {
 			return {
-				name: "",
-				tel: "",
-				idNum: "",
-				theWarn: "",
+				headImg: "",
+				basicMsg: ""
 			}
+		},
+		mounted() {
+			this.basicMsg = JSON.parse(sessionStorage.getItem("vBasicMsg"));
+			this.headImg = this.basicMsg.headerimg;
 		},
 		methods: {
 
 		},
 
 		beforeRouteLeave(to, from, next) {
-			if(to.name=="myBusiness"){
-				to.meta.needReload=true;
-				to.meta.scollTopPosition=0;
+			if(to.name == "myBusiness") {
+				to.meta.needReload = true;
+				to.meta.scollTopPosition = 0;
 			}
 			next()
 		},
 		created() {
 			this.isFirstEnter = true;
+
 		},
 		activated() {
 			if(this.$parent.vBasicMsg) {
@@ -98,25 +101,30 @@
 	#MyFile-top .myName .wechatCode {
 		color: #999999;
 		font-size: 0.8rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	
-	.itemList{
-		margin-top:1rem
+	.itemList {
+		margin-top: 1rem
 	}
-	.itemList .card{
+	
+	.itemList .card {
 		width: 100%;
 		line-height: 2.5rem;
 		font-size: 0.8rem;
-		padding:0 1rem;
+		padding: 0 1rem;
 		background: #FFFFFF;
 		border-bottom: 1px solid #EFEFEF;
 	}
 	
-	.itemList .card i{
+	.itemList .card i {
 		font-size: 1rem;
 		line-height: 2.5rem;
 	}
-	.itemList .card:last-child{
+	
+	.itemList .card:last-child {
 		border-bottom: none;
 	}
 </style>

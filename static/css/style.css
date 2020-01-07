@@ -49,7 +49,7 @@
 
 .el-card__body,
 .el-card__header {
-	padding: 0.7rem;
+	padding: 0.5rem 0.7rem;
 }
 
 .btn {
@@ -118,6 +118,11 @@
 	background-size: 0.5rem;
 }
 
+.icon.fk-wechat{
+	background: url(../../static/img/fk-wechat.png) no-repeat 0.25rem center;
+	background-size: 1.1rem;
+}
+
 .el-input__icon{
 	width: 1rem;
 	line-height: 2rem;
@@ -146,7 +151,7 @@
 }
 
 .theContent .el-form-item__content {
-	width: 15.8rem;
+	width: 13.8rem;
 }
 
 .theDetail .el-input__inner,
@@ -158,6 +163,6 @@
 	font-size: 0.65rem;
 }
 
-.infinite-list-wrapper{
-	height: 40rem;
+body .mescroll-totop{
+	bottom: 4rem;
 }

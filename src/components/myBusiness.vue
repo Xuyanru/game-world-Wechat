@@ -79,17 +79,17 @@
 					noMoreSize: 3, // 如果列表已无数据,可设置列表的总数量要大于等于5条才显示无更多数据;避免列表数据过少(比如只有一条数据),显示无更多数据会不好看
 					toTop: {
 						duration: 100, // 回到顶部的动画时长,默认300ms
-						src: '../../static/img/mescroll-totop.png' // 回到顶部按钮的图片路径,支持网络图
+						src: './static/mescroll/mescroll-totop.png' // 回到顶部按钮的图片路径,支持网络图
 					},
 					empty: {
 						// 列表第一页无任何数据时,显示的空提示布局; 需配置warpId才生效;
 						warpId: 'dataList1', // 父布局的id;
-						icon: '../../static/img/mescroll-empty.png', // 图标,支持网络图
+						icon: './static/mescroll/mescroll-empty.png', // 图标,支持网络图
 						tip: '暂无相关数据~', // 提示
-						btntext: '去逛逛 >', // 按钮,默认""
-						btnClick() { // 点击按钮的回调,默认null
-							alert('点击了按钮,具体逻辑自行实现')
-						}
+						// btntext: '去逛逛 >', // 按钮,默认""
+						// btnClick() { // 点击按钮的回调,默认null
+						// 	alert('点击了按钮,具体逻辑自行实现')
+						// }
 					},
 					lazyLoad: {
 						use: true // 是否开启懒加载,默认false
@@ -147,7 +147,7 @@
 						}
 						//						else if(data.code == 1000 && data.content == 0) {
 						//							this.count = data.count;
-						//						} 
+						//						}
 						else {
 							this.mescroll.endErr();
 							this.$parent.layerTimeout(data.msg);
@@ -201,13 +201,14 @@
 							} else {
 								var theStatusMsg = this.statusMsg[idx];
 								listDetail.status = theStatusMsg;
+                listDetail.refreshdate="1秒前";
 								listDetail.showOperation = false;
 							}
 						} else {
-							this.$parent.layerTimeout(data.cause);
 							this.count = 0;
 							return false
 						}
+            this.$parent.layerTimeout(data.msg);
 					})
 			},
 			gotoDetail(list) {
@@ -247,7 +248,7 @@
 
 <style scoped="scoped">
 	#myBusiness {}
-	
+
 	.mescroll {
 		position: fixed;
 		top: 0;
@@ -255,71 +256,73 @@
 		height: auto;
 		/*如设置bottom:50px,则需height:auto才能生效*/
 	}
-	
+
 	.mescroll-totop{
 		bottom:2rem
 	}
-	
+
 	#myBusiness .top-select {
 		/*font-size: 0.8rem;
 		line-height: 40px;*/
 		text-align: center;
 	}
-	
+
 	#myBusiness .el-row .el-col {
 		margin-bottom: 1px;
 	}
-	
+
 	.el-drawer.ltr,
 	.el-drawer.rtl,
 	.el-drawer__container {
 		overflow: auto;
 	}
-	
-	.search-list ul li {
-		padding: .5rem;
-		border-bottom: 1px solid #999
+
+	.search-list ul li .el-card,
+	.search-list ul li  .el-card.is-always-shadow{
+	  border: none;
+	  box-shadow: none;
 	}
-	
+
 	.search-list ul li .list-img {
-		width: 5.25rem;
-		height: 5.25rem
+	  width: 5.2rem;
+	  height: 5.2rem
 	}
-	
+
 	.search-list ul li .list-img img {
-		width: 100%;
-		height: 100%;
-		border-radius: 10px
+	  width: 100%;
+	  height: 100%;
+	  border-radius: 10px
 	}
-	
+
 	.search-list ul li .list-msg {
-		height: 5.25rem;
-		margin-left: 5.25rem;
-		padding-left: .5rem;
+	  height: 5.2rem;
+	  margin-left: 5.2rem;
+	  padding-left: .5rem;
 	}
-	
+
 	.search-list ul li .list-msg .line-one {
-		font-size: .8rem;
-		line-height: 1rem;
+		font-size: .7rem;
+		line-height: .8rem;
 		overflow: hidden;
-		white-space: nowrap;
 		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 		padding-top: .2rem;
-		height: 1.5rem
+		height: 1.8rem
 	}
-	
+
 	.search-list ul li .list-msg .line-one span {
-		float: left;
 		width: 80%;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	
+
 	.search-list ul li .list-msg .line-one img {
 		width: 1.5rem;
 		margin-top: -0.3rem;
 	}
-	
+
 	.search-list ul li .list-msg .line-two,
 	.search-list ul li .list-msg .line-three,
 	.search-list ul li .list-msg .line-four {
@@ -330,44 +333,44 @@
 		white-space: nowrap;
 		text-overflow: ellipsis
 	}
-	
+
 	.search-list ul li .list-msg .line-three .list-sponsor {
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		margin-right: 0.2rem;
 	}
-	
+
 	.search-list ul li .list-msg .line-three span.list-mumber {
 		color: #929292;
 		margin-left: 0;
 		width: 4.5rem;
 	}
-	
+
 	.search-list ul li .list-msg .line-four {
 		line-height: 1.5rem;
 		margin-top: 0.3rem
 	}
-	
+
 	.list-icon {
 		padding-right: .3rem
 	}
-	
+
 	.el-drawer__body {
 		padding: 0.8rem;
 	}
-	
+
 	.search-list ul li .operation {
 		margin-top: 0.4rem;
 	}
-	
+
 	.search-list ul li .operation span {
 		width: 20%;
 		line-height: 1rem;
 		text-align: center;
 		color: #438fef;
 	}
-	
+
 	.search-list ul li .operation span.disabled {
 		color: #9e9e9e;
 	}
