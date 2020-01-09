@@ -132,7 +132,7 @@
 .theContent .el-form-item__label,
 .el-drawer .el-form-item__label{
 	padding: 0 0.1rem 0 0;
-	font-size: 0.65rem;
+	font-size: 0.6rem;
 	line-height: 2rem;
 }
 
@@ -147,11 +147,11 @@
 .el-drawer .el-form-item__content {
 	width: 4rem;
 	line-height: 2rem;
-	font-size: 0.65rem;
+	font-size: 0.6rem;
 }
 
 .theContent .el-form-item__content {
-	width: 13.8rem;
+	width: 15.2rem;
 }
 
 .theDetail .el-input__inner,

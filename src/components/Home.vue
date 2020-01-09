@@ -68,7 +68,8 @@
 								<span class="text-danger lf" v-if="item.pricetype==3">金币</span>
 								<span class="text-danger lf" v-if="item.pricetype==1">元宝</span>
 								<span class="text-danger lf" v-if="item.pricetype==2">RMB</span>
-								<!--<span class="lf list-mumber">{{item.isprice==0?"可议价":"不可议价"}}</span>-->
+								<span class="rt" >{{item.province+" "+item.city}}</span>
+								
 							</p>
 							<p class="line-four clear">
 								<span class="lf">{{item.equipmentname}}</span>
@@ -385,14 +386,14 @@
 
 			},
 			'theDate.areaid' (val, oldVal) {
-				//				if(!oldVal) return;
+				if(!oldVal) return;
 				this.mescroll.resetUpScroll() // 刷新列表数据
 			},
 			//
 			'theDate.groupid' (val, oldVal) {
 				if(val || val == 0) {
 					this.getTypeList();
-					//					if(!oldVal) return;
+					if(!oldVal) return;if(!oldVal) return;
 					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},
@@ -401,7 +402,7 @@
 				if(val || val == 0) {
 					this.getNameList();
 					this.getPropertyList();
-					//					if(!oldVal) return;
+					if(!oldVal) return;
 					this.mescroll.resetUpScroll() // 刷新列表数据
 				}
 			},

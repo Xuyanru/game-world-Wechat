@@ -24,7 +24,7 @@
             <input class="lf" v-model="theData.wechat" type="text" placeholder="请输入您的电话" name="" id="" value="" />
           </li>
           <li class="clear fk-idcard">
-            <p class="lf fk-idcard icon">角色ID</p>
+            <p class="lf fk-idcard icon">角色名称</p>
             <input class="lf" v-model="theData.pid" type="text" placeholder="请输入您的电话" name="" id="" value="" />
           </li>
           <li class="clear fk-timec">

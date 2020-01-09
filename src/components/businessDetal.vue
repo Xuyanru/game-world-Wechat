@@ -26,6 +26,7 @@
 						<!--<span class="">{{theDetail.isprice==0?"可议价":"不可议价"}}</span>-->
 					</p>
 					<p>发布时间：{{theDetail.refreshdate}}</p>
+					<!--<p>浏览次数：{{theDetail.refreshdate}}</p>-->
 					<p>玩家在线时间：{{theDetail.onlinetime}}</p>
 					<p>玩家个性签名：{{theDetail.motto}}</p>
 					<p>装备说明：{{theDetail.content}}</p>
@@ -36,9 +37,9 @@
 			<h4>联系方式</h4>
 			<p v-if="productOrnerMsg.wechat">微信：{{productOrnerMsg.wechat}}</p>
 			<p v-if="productOrnerMsg.qq">QQ：{{productOrnerMsg.qq}}</p>
-			<p v-if="productOrnerMsg.phone">手机：{{productOrnerMsg.phone}}</p>
+			<p v-if="productOrnerMsg.pid">角色名称：{{productOrnerMsg.pid}}</p>
 		</div>
-		<div class="btn" @click="getConnctMsg">
+		<div class="btn" @click="getConnctMsg" v-if="!showConnctMsg">
 			查看联系方式
 		</div>
 	</div>
@@ -51,7 +52,7 @@
 			return {
 				theDetail: "",
 				productOrnerMsg: "",
-				showConnctMsg: false
+				showConnctMsg: false,
 			}
 		},
 		methods: {
@@ -60,7 +61,19 @@
 				this.theDetail = this.$route.params.listMsg;
 				this.productOrnerMsg = "";
 				this.showConnctMsg = false;
+				this.goodsVisitorVolumeAddFun();
 			},
+			//浏览次数+1
+			goodsVisitorVolumeAddFun() {
+				this.$ajax.get("sellManage/goodsVisitorVolumeAdd?equipmentGuid=" + this.theDetail.guid, {
+						timeout: 1000 * 5
+					})
+					.then((response) => {
+						console.log(response);
+						
+					})
+			},
+			//获取联系方式
 			getConnctMsg() {
 				this.$ajax.get("sellManage/showGoodsContact?equipmentGuid=" + this.theDetail.guid, {
 						timeout: 1000 * 5

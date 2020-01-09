@@ -37,7 +37,7 @@
 						</div>
 						<div class="operation clear" v-if="item.showOperation">
 							<!--1 上架 2 下架 3交易成功 4删除 5刷新-->
-							<span class="lf" :class="{'disabled':item.status=='刷新'}" @click.stop="changeStatus(5,index,item)">
+							<span class="lf" @click.stop="changeStatus(5,index,item)">
 								刷新
 							</span>
 							<span class="lf" :class="{'disabled':item.status=='上架'}" @click.stop="changeStatus(1,index,item)">
@@ -46,9 +46,9 @@
 							<span class="lf" :class="{'disabled':item.status=='下架'}" @click.stop="changeStatus(2,index,item)">
 								下架
 							</span>
-							<span class="lf" :class="{'disabled':item.status=='交易成功'}" @click.stop="changeStatus(3,index,item)">
+							<!--<span class="lf" :class="{'disabled':item.status=='交易成功'}" @click.stop="changeStatus(3,index,item)">
 								交易成功
-							</span>
+							</span>-->
 							<span class="lf" :class="{'disabled':item.status=='删除'}" @click.stop="changeStatus(4,index,item)">
 								删除
 							</span>
@@ -198,17 +198,22 @@
 						if(data.code == 1000) {
 							if(idx == 4) {
 								this.dataList.splice(theIdx, 1);
+								if(this.dataList==0){
+									this.mescroll.resetUpScroll();
+								}
+							} else if(idx == 5) {
+								listDetail.refreshdate = "1秒前";
 							} else {
 								var theStatusMsg = this.statusMsg[idx];
 								listDetail.status = theStatusMsg;
-                listDetail.refreshdate="1秒前";
 								listDetail.showOperation = false;
 							}
+							listDetail.showOperation = false;
 						} else {
 							this.count = 0;
 							return false
 						}
-            this.$parent.layerTimeout(data.msg);
+						this.$parent.layerTimeout(data.msg);
 					})
 			},
 			gotoDetail(list) {
@@ -222,12 +227,18 @@
 		},
 		beforeRouteEnter(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteEnter不用写
 			next(vm => {
-				// 找到当前mescroll的ref,调用子组件mescroll-vue的beforeRouteEnter方法
-				vm.$refs.mescroll && vm.$refs.mescroll.beforeRouteEnter() // 进入路由时,滚动到原来的列表位置,恢复回到顶部按钮和isBounce的配置
+				if(from.name=="MyFile"){
+					vm.mescroll.resetUpScroll();
+				}else{
+					vm.$refs.mescroll && vm.$refs.mescroll.beforeRouteEnter() 
+				}
+				
 			})
 		},
 		beforeRouteLeave(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteLeave不用写
 			// 找到当前mescroll的ref,调用子组件mescroll-vue的beforeRouteEnter方法
+//			if(to.meta)
+console.log(to);
 			this.$refs.mescroll && this.$refs.mescroll.beforeRouteLeave() // 退出路由时,记录列表滚动的位置,隐藏回到顶部按钮和isBounce的配置
 			next()
 		},
@@ -248,7 +259,7 @@
 
 <style scoped="scoped">
 	#myBusiness {}
-
+	
 	.mescroll {
 		position: fixed;
 		top: 0;
@@ -256,50 +267,50 @@
 		height: auto;
 		/*如设置bottom:50px,则需height:auto才能生效*/
 	}
-
-	.mescroll-totop{
-		bottom:2rem
+	
+	.mescroll-totop {
+		bottom: 2rem
 	}
-
+	
 	#myBusiness .top-select {
 		/*font-size: 0.8rem;
 		line-height: 40px;*/
 		text-align: center;
 	}
-
+	
 	#myBusiness .el-row .el-col {
 		margin-bottom: 1px;
 	}
-
+	
 	.el-drawer.ltr,
 	.el-drawer.rtl,
 	.el-drawer__container {
 		overflow: auto;
 	}
-
+	
 	.search-list ul li .el-card,
-	.search-list ul li  .el-card.is-always-shadow{
-	  border: none;
-	  box-shadow: none;
+	.search-list ul li .el-card.is-always-shadow {
+		border: none;
+		box-shadow: none;
 	}
-
+	
 	.search-list ul li .list-img {
-	  width: 5.2rem;
-	  height: 5.2rem
+		width: 5.2rem;
+		height: 5.2rem
 	}
-
+	
 	.search-list ul li .list-img img {
-	  width: 100%;
-	  height: 100%;
-	  border-radius: 10px
+		width: 100%;
+		height: 100%;
+		border-radius: 10px
 	}
-
+	
 	.search-list ul li .list-msg {
-	  height: 5.2rem;
-	  margin-left: 5.2rem;
-	  padding-left: .5rem;
+		height: 5.2rem;
+		margin-left: 5.2rem;
+		padding-left: .5rem;
 	}
-
+	
 	.search-list ul li .list-msg .line-one {
 		font-size: .7rem;
 		line-height: .8rem;
@@ -311,18 +322,18 @@
 		padding-top: .2rem;
 		height: 1.8rem
 	}
-
+	
 	.search-list ul li .list-msg .line-one span {
 		width: 80%;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-
+	
 	.search-list ul li .list-msg .line-one img {
 		width: 1.5rem;
 		margin-top: -0.3rem;
 	}
-
+	
 	.search-list ul li .list-msg .line-two,
 	.search-list ul li .list-msg .line-three,
 	.search-list ul li .list-msg .line-four {
@@ -333,44 +344,45 @@
 		white-space: nowrap;
 		text-overflow: ellipsis
 	}
-
+	
 	.search-list ul li .list-msg .line-three .list-sponsor {
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		margin-right: 0.2rem;
 	}
-
+	
 	.search-list ul li .list-msg .line-three span.list-mumber {
 		color: #929292;
 		margin-left: 0;
 		width: 4.5rem;
 	}
-
+	
 	.search-list ul li .list-msg .line-four {
 		line-height: 1.5rem;
 		margin-top: 0.3rem
 	}
-
+	
 	.list-icon {
 		padding-right: .3rem
 	}
-
+	
 	.el-drawer__body {
 		padding: 0.8rem;
 	}
-
+	
 	.search-list ul li .operation {
 		margin-top: 0.4rem;
 	}
-
+	
 	.search-list ul li .operation span {
-		width: 20%;
+		width: 25%;
 		line-height: 1rem;
 		text-align: center;
 		color: #438fef;
+		font-size: 0.7rem;
 	}
-
+	
 	.search-list ul li .operation span.disabled {
 		color: #9e9e9e;
 	}

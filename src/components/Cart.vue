@@ -1,6 +1,6 @@
 <template class="needHeight">
 	<div id="Cart">
-		<div>
+		<div class="inner">
 			<el-row class="top-select lineOne text-center" :gutter="1">
 				<el-col :span="8" class="line-one">
 					<el-select v-model="theDate.gameid" placeholder="游戏名称">
@@ -39,12 +39,14 @@
 				</el-col>
 			</el-row>
 			<el-form :inline="true" class="demo-form-inline theDetail clear">
-				<el-form-item :label="item1.labeltext" v-for="item1 in propertyList">
+				<el-form-item :label="item1.labeltext" v-for="item1 in propertyList" :class="{'long':item1.labeltext.length>2}">
 					<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
 						<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
 						</el-option>
 					</el-select>
 				</el-form-item>
+			</el-form>
+			<el-form :inline="true" class="demo-form-inline theDetail clear">
 				<el-form-item label="价格">
 					<el-input v-model="theDate.price"></el-input>
 				</el-form-item>
@@ -82,7 +84,7 @@
 					<el-input v-model="theDate.wechat"></el-input>
 				</el-form-item>
 				<el-form-item label="角色名称">
-					<el-input v-model="theDate.roleName"></el-input>
+					<el-input v-model="theDate.pid"></el-input>
 				</el-form-item>
 			</el-form>
 			<div class="text-center">
@@ -120,7 +122,7 @@
 					title: "",
 					content: "",
 					bigimg: "",
-					roleName: "",
+					pid: "",
 					qq: '',
 					wechat: ''
 				},
@@ -150,6 +152,8 @@
 					"vBasicMsg"));
 				this.theDate.qq = theBasicMsg.qq;
 				this.theDate.wechat = theBasicMsg.wechat;
+				this.theDate.pid = theBasicMsg.pid;
+				this.theDate.count = 1;
 			},
 			//获取该用户是否有发布权限
 			getIsPublish: function() {
@@ -176,7 +180,6 @@
 							this.theDate.gameid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.gameList = [];
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -195,7 +198,6 @@
 							this.theDate.areaid = data.content[0].id;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.areaList = [];
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -215,7 +217,6 @@
 						} else if(data.code == 1000 && data.content == 0) {
 							this.groupList = [];
 							this.theDate.groupid = "";
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -235,9 +236,6 @@
 						} else if(data.code == 1000 && data.content == 0) {
 							this.typeList = [];
 							this.theDate.equipmenttypeid = "";
-							this.nameList = [];
-							this.theDate.equipmentnameid = "";
-							this.noListWarn = true;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -266,7 +264,7 @@
 			//获取属性列表
 			getPropertyList: function() {
 				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid',
-					'equipmentnameid', 'qq', 'wechat', 'phone'
+					'equipmentnameid', 'qq', 'wechat', 'pid'
 				]));
 				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 20
@@ -327,6 +325,7 @@
 							this.$parent.layerTimeout("发布成功");
 							this.theImg = "";
 							this.getPropertyList();
+							this.theDate.count = 1;
 						} else {
 							this.$parent.layerTimeout(data.msg);
 							return false
@@ -340,7 +339,7 @@
 				console.log(val);
 			},
 			'theDate.gameid' (val) {
-				if(val) {
+				if(val | val == 0) {
 					this.getAreaList();
 					this.getGroupList();
 				}
@@ -351,7 +350,7 @@
 			},
 			//
 			'theDate.groupid' (val) {
-				if(val) {
+				if(val | val == 0) {
 					this.getTypeList();
 					if(val == 3) {
 						this.pricetypeList = [{
@@ -377,7 +376,7 @@
 			},
 			//
 			'theDate.equipmenttypeid' (val) {
-				if(val) {
+				if(val | val == 0) {
 					this.getNameList();
 					this.getPropertyList();
 				}
@@ -408,7 +407,7 @@
 		height: 100%;
 	}
 	
-	#Cart>div {
+	#Cart>div.inner {
 		height: 100%;
 		overflow: auto;
 		padding-bottom: 2rem;
@@ -453,12 +452,38 @@
 		padding: 10px;
 	}
 	
+	#Cart .theDetail {
+		padding: 0.5rem 1rem 0 0;
+	}
+	
+	/*#Cart .theDetail*/
+	
 	#Cart .theDetail .el-form-item {
 		float: left;
+		width: 33.3%;
+		margin-right: 0;
+		text-align: right;
 	}
+	/*#Cart .theDetail .el-form-item.long {
+		width: 50%;
+	}
+	*/
 	
 	#Cart .theDetail .el-form-item {
 		margin-bottom: 10px;
+	}
+	
+	#Cart .theDetail .el-input__inner {
+		padding: 0 0.1rem;
+		text-align: center;
+	}
+	
+	#Cart .theDetail .el-input__suffix {
+		display: none;
+	}
+	
+	#Cart .theDetail .el-form-item__content {
+		width: 3rem;
 	}
 	
 	#Cart .theContent {
@@ -494,7 +519,11 @@
 	}
 	
 	.theContent .el-form-item__label {
-		width: 3rem;
+		width: 2.5rem;
+	}
+	
+	#Cart .theContent .el-input__inner,
+	#Cart .el-drawer .el-input__inner {
 		text-align: left;
 	}
 </style>
