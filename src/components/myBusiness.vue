@@ -144,14 +144,10 @@
 							})
 							//							this.pageNo++;
 							console.log(this.dataList);
-						}
-						//						else if(data.code == 1000 && data.content == 0) {
-						//							this.count = data.count;
-						//						}
-						else {
-							this.mescroll.endErr();
+						} else {
 							this.$parent.layerTimeout(data.msg);
 							this.count = 0;
+							this.mescroll.endErr();
 							return false
 						}
 
@@ -161,8 +157,7 @@
 			},
 			getGoodsFun: function() {
 				this.$parent.getBasicUrlFun(this.getSellGoods);
-			},
-			//改变商品状态
+			}, //改变商品状态
 			changeStatus: function(idx, theIdx, listDetail) {
 				if(idx == listDetail.status) return;
 				var me = this;
@@ -171,17 +166,11 @@
 						content: '是否确定删除？',
 						btn: ['确定', '取消'],
 						yes: function(index, layero) {
-							//按钮【按钮一】的回调
-							alert("111");
 							me.changeStatusFun(idx, theIdx, listDetail);
 							layer.closeAll();
 						},
 						btn1: function(index, layero) {
-							//按钮【按钮二】的回调
-							alert("222");
 							layer.closeAll();
-
-							//return false 开启该代码可禁止点击该按钮关闭
 						}
 					});
 				} else {
@@ -198,7 +187,7 @@
 						if(data.code == 1000) {
 							if(idx == 4) {
 								this.dataList.splice(theIdx, 1);
-								if(this.dataList==0){
+								if(this.dataList == 0) {
 									this.mescroll.resetUpScroll();
 								}
 							} else if(idx == 5) {
@@ -209,9 +198,6 @@
 								listDetail.showOperation = false;
 							}
 							listDetail.showOperation = false;
-						} else {
-							this.count = 0;
-							return false
 						}
 						this.$parent.layerTimeout(data.msg);
 					})
@@ -227,18 +213,18 @@
 		},
 		beforeRouteEnter(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteEnter不用写
 			next(vm => {
-				if(from.name=="MyFile"){
+				if(from.name == "MyFile") {
 					vm.mescroll.resetUpScroll();
-				}else{
-					vm.$refs.mescroll && vm.$refs.mescroll.beforeRouteEnter() 
+				} else {
+					vm.$refs.mescroll && vm.$refs.mescroll.beforeRouteEnter()
 				}
-				
+
 			})
 		},
 		beforeRouteLeave(to, from, next) { // 如果没有配置回到顶部按钮或isBounce,则beforeRouteLeave不用写
 			// 找到当前mescroll的ref,调用子组件mescroll-vue的beforeRouteEnter方法
-//			if(to.meta)
-console.log(to);
+			//			if(to.meta)
+			console.log(to);
 			this.$refs.mescroll && this.$refs.mescroll.beforeRouteLeave() // 退出路由时,记录列表滚动的位置,隐藏回到顶部按钮和isBounce的配置
 			next()
 		},

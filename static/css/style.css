@@ -163,6 +163,14 @@
 	font-size: 0.65rem;
 }
 
+.text-gray .el-input__inner{
+	color: #c0c4cc;
+}
+
+.el-select-dropdown__item{
+	text-align: center;
+}
+
 body .mescroll-totop{
 	bottom: 4rem;
 }

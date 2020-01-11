@@ -40,7 +40,7 @@
 			</el-row>
 			<el-form :inline="true" class="demo-form-inline theDetail clear">
 				<el-form-item :label="item1.labeltext" v-for="item1 in propertyList" :class="{'long':item1.labeltext.length>2}">
-					<el-select v-model="theDate[''+item1.inputname]" placeholder="请选择">
+					<el-select :class="{'text-gray':theDate[''+item1.inputname]=='请选择'}" v-model="theDate[''+item1.inputname]" placeholder="请选择" clearable="true">
 						<el-option v-for="item2 in item1.inputvalue.split(',')" :key="item2" :label="item2" :value="item2">
 						</el-option>
 					</el-select>
@@ -51,14 +51,14 @@
 					<el-input v-model="theDate.price"></el-input>
 				</el-form-item>
 				<el-form-item label="类型">
-					<el-select v-model="theDate.pricetype" placeholder="请选择">
+					<el-select :class="{'text-gray':theDate.pricetype==0}" v-model="theDate.pricetype" placeholder="请选择">
 						<el-option v-for="item in pricetypeList" :key="item.type" :label="item.name" :value="item.type">
 						</el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item label="数量">
-					<el-select v-model="theDate.count" placeholder="请选择">
-						<el-option v-for="item in 10" :key="item" :label="item" :value="item">
+					<el-select :class="{'text-gray':theDate.count=='请选择'}" v-model="theDate.count" placeholder="请选择">
+						<el-option v-for="item in ['请选择',1,2,3,4,5,6,7,8,9,10]" :key="item" :label="item" :value="item">
 						</el-option>
 					</el-select>
 				</el-form-item>
@@ -76,17 +76,20 @@
 					<img :src="theImg" alt="" v-show="theImg" />
 				</el-form-item>
 			</el-form>
-			<el-form :inline="true" class="demo-form-inline theContent clear">
+			<el-form :inline="true" class="demo-form-inline theContent theContent1 clear">
 				<el-form-item label="微信">
-					<el-input v-model="theDate.qq"></el-input>
-				</el-form-item>
-				<el-form-item label="Q Q">
 					<el-input v-model="theDate.wechat"></el-input>
 				</el-form-item>
-				<el-form-item label="角色名称">
+				<el-form-item label="Q Q">
+					<el-input v-model="theDate.qq"></el-input>
+				</el-form-item>
+				<el-form-item label="角色名字">
 					<el-input v-model="theDate.pid"></el-input>
 				</el-form-item>
 			</el-form>
+			<p class="text-danger theredWarn">
+				<span>三种联系方式 至少填一种，且必须真实有效，否则会被删帖或封号</span>
+			</p>
 			<div class="text-center">
 				<el-button class="el-col-18 el-col-offset-3" type="warning" @click="setGoodsData">发&nbsp;&nbsp;&nbsp;布</el-button>
 			</div>
@@ -163,7 +166,10 @@
 					.then((data) => {
 						console.log(data);
 						if(data.code != 1000) {
-							this.$parent.layerTimeout(data.msg);
+							layer.open({
+								content: "<p>" + data.msg + "</p>",
+								btn: ['确定'],
+							});
 							return false
 						}
 					})
@@ -266,12 +272,16 @@
 				this.theDate = JSON.parse(JSON.stringify(this.theDate, ['gameid', 'areaid', 'groupid', 'equipmenttypeid',
 					'equipmentnameid', 'qq', 'wechat', 'pid'
 				]));
+				this.theDate.count = 1;
 				this.$ajax.get("property/propertyList?typeId=" + this.theDate.equipmenttypeid, {
 						timeout: 1000 * 20
 					})
 					.then((data) => {
 						console.log(data);
 						if(data.code == 1000 && data.content.length > 0) {
+							for(var i = 0; i < data.content.length; i++) {
+								data.content[i].inputvalue = "请选择," + data.content[i].inputvalue;
+							}
 							this.propertyList = data.content;
 						} else if(data.code == 1000 && data.content == 0) {
 							this.propertyList = [];
@@ -295,7 +305,7 @@
 			//整理发布数据
 			setGoodsData: function() {
 				for(var key in this.theDate) {
-					if(!this.theDate[key]) {
+					if(!this.theDate[key]||this.theDate[key]=="请选择") {
 						delete this.theDate[key];
 					}
 				}
@@ -354,6 +364,14 @@
 					this.getTypeList();
 					if(val == 3) {
 						this.pricetypeList = [{
+							type: 2,
+							name: "RMB"
+						}]
+					} else {
+						this.pricetypeList = [{
+							type: 0,
+							name: "请选择"
+						}, {
 							type: 3,
 							name: "金币"
 						}, {
@@ -362,14 +380,6 @@
 						}, {
 							type: 2,
 							name: "RMB"
-						}]
-					} else {
-						this.pricetypeList = [{
-							type: 3,
-							name: "金币"
-						}, {
-							type: 1,
-							name: "元宝"
 						}]
 					}
 				}
@@ -455,7 +465,6 @@
 	#Cart .theDetail {
 		padding: 0.5rem 1rem 0 0;
 	}
-	
 	/*#Cart .theDetail*/
 	
 	#Cart .theDetail .el-form-item {
@@ -489,6 +498,18 @@
 	#Cart .theContent {
 		padding-top: 0;
 		text-align: left;
+	}
+	
+	#Cart .theContent1{
+		padding-left:0;
+	}
+	
+	#Cart .theContent1 .el-form-item:last-child{
+		margin-bottom: 0;
+	}
+	
+	#Cart .theContent1 .el-form-item__label{
+		width: 3rem;
 	}
 	
 	#Cart .theContent .el-form-item {
@@ -525,5 +546,12 @@
 	#Cart .theContent .el-input__inner,
 	#Cart .el-drawer .el-input__inner {
 		text-align: left;
+	}
+	
+	#Cart  .theredWarn{
+		font-size: 0.7rem;
+    padding: 0.5rem 1rem;
+    background: #DEDEDE;
+    margin-bottom: 0.5rem;
 	}
 </style>

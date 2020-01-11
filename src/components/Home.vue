@@ -340,14 +340,10 @@
 							})
 							//							this.pageNo++;
 							console.log(this.dataList);
-						}
-						//						else if(data.code == 1000 && data.content == 0) {
-						//							this.count = data.count;
-						//						}
-						else {
-							this.mescroll.endErr();
+						}else {
 							this.$parent.layerTimeout(data.msg);
 							this.count = 0;
+							this.mescroll.endErr();
 							return false
 						}
 

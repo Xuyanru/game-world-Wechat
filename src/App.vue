@@ -131,37 +131,37 @@
 				}, 10);
 			});
 //
-			var theBasicMsg = {
-				"guid": "ff6f9086-ef08-4dcf-b101-65a237039386",
-				"phone": "15830733627",
-				"headerimg": "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLSrpu0ZJm6p6c8n0ajPA56UgqYIcIworawMwmMtoFQKkHlZVB6nQt0hupUMmO88ReoSibtJEfdhBQ/132",
-				"photo": null,
-				"pid": "1dasda",
-				"qq": "1564564564",
-				"wechat": "dsds",
-				"gameid": 1,
-				"areaid": 1,
-				"sex": 2,
-				"city": "邯郸",
-				"province": "河北",
-				"country": "中国",
-				"nickname": "汝",
-				"remark": null,
-				"level": 1,
-				"score": 0,
-				"onlinetime": "每天",
-				"motto": "vfdvfdvd",
-				"mottocheck": 1,
-				"pidcheck": 0,
-				"qqcheck": 0,
-				"wechatcheck": 0,
-				"phonecheck": 0,
-				"usernum": 12270207,
-				"admin": 0,
-				"email": null
-			}
-			sessionStorage.setItem("vBasicMsg", JSON.stringify(theBasicMsg));
-			this.getBasicUrlFun(this.$refs.child.getGameList);
+//			 var theBasicMsg = {
+//			 	"guid": "ff6f9086-ef08-4dcf-b101-65a237039386",
+//			 	"phone": "15830733627",
+//			 	"headerimg": "http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLSrpu0ZJm6p6c8n0ajPA56UgqYIcIworawMwmMtoFQKkHlZVB6nQt0hupUMmO88ReoSibtJEfdhBQ/132",
+//			 	"photo": null,
+//			 	"pid": "1dasda",
+//			 	"qq": "1564564564",
+//			 	"wechat": "dsds",
+//			 	"gameid": 1,
+//			 	"areaid": 1,
+//			 	"sex": 2,
+//			 	"city": "邯郸",
+//			 	"province": "河北",
+//			 	"country": "中国",
+//			 	"nickname": "汝",
+//			 	"remark": null,
+//			 	"level": 1,
+//			 	"score": 0,
+//			 	"onlinetime": "每天",
+//			 	"motto": "vfdvfdvd",
+//			 	"mottocheck": 1,
+//			 	"pidcheck": 0,
+//			 	"qqcheck": 0,
+//			 	"wechatcheck": 0,
+//			 	"phonecheck": 0,
+//			 	"usernum": 12270207,
+//			 	"admin": 0,
+//			 	"email": null
+//			 }
+//			 sessionStorage.setItem("vBasicMsg", JSON.stringify(theBasicMsg));
+//			 this.getBasicUrlFun(this.$refs.child.getGameList);
 
 			this.getBasicUrlFun();
 
